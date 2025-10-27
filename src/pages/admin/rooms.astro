@@ -1,0 +1,29 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Gestión de Habitaciones - Hotel Sol">
+  <div id="room-management-app"></div>
+</Layout>
+
+<script>
+  import RoomManagement from '../../components/vue/RoomManagement.vue';
+  import { createApp } from 'vue';
+
+  // Verificar autenticación
+  const token = localStorage.getItem('hotelToken');
+  if (!token) {
+    window.location.href = '/login';
+  }
+
+  // Crear y montar la aplicación Vue
+  const app = createApp(RoomManagement);
+  app.mount('#room-management-app');
+</script>
+
+<style>
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+</style>

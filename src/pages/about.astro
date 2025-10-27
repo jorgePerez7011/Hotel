@@ -1,0 +1,388 @@
+---
+// About page - Página "Nosotros" del Hotel Sol
+---
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosotros - Hotel Sol</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="font-sans">
+    <!-- Navigation Header -->
+    <header class="bg-white shadow-sm relative z-50">
+        <!-- Top Panel -->
+        <div class="bg-gray-100 py-2 px-6">
+            <div class="container mx-auto flex justify-between items-center">
+                <!-- Social Links -->
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm italic text-gray-600">Síguenos:</span>
+                    <div class="flex space-x-2">
+                        <a href="#" class="text-gray-600 hover:text-primary-600"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-600 hover:text-primary-600"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-gray-600 hover:text-primary-600"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Logo -->
+                <div class="text-center">
+                    <h1 class="text-2xl font-bold text-gray-800">HOTEL SOL</h1>
+                </div>
+                
+                <!-- Contact Info -->
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-phone text-primary-600"></i>
+                    <a href="tel:+573001234567" class="text-gray-600 hover:text-primary-600">+57 (300) 123-4567</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Navigation -->
+        <nav class="py-4 px-6">
+            <div class="container mx-auto flex justify-center">
+                <ul class="flex space-x-8">
+                    <li><a href="/" class="text-gray-700 hover:text-primary-600 transition-colors">Inicio</a></li>
+                    <li><a href="/about" class="text-primary-600 font-semibold border-b-2 border-primary-600 pb-1">Nosotros</a></li>
+                    <li><a href="/rooms" class="text-gray-700 hover:text-primary-600 transition-colors">Habitaciones</a></li>
+                    <li><a href="/contact" class="text-gray-700 hover:text-primary-600 transition-colors">Contacto</a></li>
+                    <li><a href="/admin/dashboard" class="text-gray-700 hover:text-primary-600 transition-colors">Panel Admin</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
+        <div class="container mx-auto px-6 text-center">
+            <div class="mb-8">
+                <h1 class="text-5xl md:text-6xl font-bold mb-4">Sol Hotel</h1>
+                <p class="text-2xl md:text-3xl font-semibold text-primary-200">Confianza y Calidad</p>
+            </div>
+            <div class="w-24 h-1 bg-yellow-400 mx-auto mb-8"></div>
+            <p class="text-xl md:text-2xl max-w-4xl mx-auto leading-relaxed">
+                Bienvenidos al Hotel Sol, donde cada estancia se convierte en una experiencia memorable de hospitalidad, confort y excelencia en el servicio.
+            </p>
+        </div>
+    </section>
+
+    <!-- Misión, Visión y Valores -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <!-- Misión -->
+            <div class="mb-16">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center">
+                        <span class="text-5xl mr-4">🎯</span> MISIÓN
+                    </h2>
+                    <div class="w-20 h-1 bg-primary-600 mx-auto"></div>
+                </div>
+                <div class="bg-gradient-to-r from-primary-50 to-blue-50 rounded-2xl p-8 md:p-12 shadow-lg">
+                    <p class="text-lg md:text-xl text-gray-700 leading-relaxed text-center max-w-4xl mx-auto">
+                        Nuestra pasión es brindar la mejor atención a nuestros huéspedes con hospitalidad, mediante un trato individualizado con amabilidad, compromiso y calidad, desarrollando productos y servicios que garantizan la satisfacción y expectativas del cliente.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Visión -->
+            <div class="mb-16">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center">
+                        <span class="text-5xl mr-4">🌟</span> VISIÓN
+                    </h2>
+                    <div class="w-20 h-1 bg-primary-600 mx-auto"></div>
+                </div>
+                <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-8 md:p-12 shadow-lg">
+                    <p class="text-lg md:text-xl text-gray-700 leading-relaxed text-center max-w-4xl mx-auto">
+                        Trabajamos para ser reconocidos, tanto por nuestras modernas instalaciones como por el servicio familiar y cercano que nos diferencia de la competencia.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Valores -->
+            <div class="mb-16">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center">
+                        <span class="text-5xl mr-4">💎</span> VALORES
+                    </h2>
+                    <div class="w-20 h-1 bg-primary-600 mx-auto"></div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-8 md:p-12 shadow-lg mb-8">
+                    <p class="text-lg md:text-xl text-gray-700 leading-relaxed text-center max-w-4xl mx-auto">
+                        Los valores de Sol Hotel Confort y Calidad están interrelacionados y se complementan mutuamente. Estos son la base de nuestro trabajo y nuestra mejora diaria.
+                    </p>
+                </div>
+
+                <!-- Grid de Valores -->
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Calidad -->
+                    <div class="group bg-white rounded-xl p-8 shadow-lg border-l-4 border-primary-500 hover:shadow-2xl hover:border-primary-600 hover:-translate-y-2 hover:scale-105 transition-all duration-500 ease-out cursor-pointer relative overflow-hidden">
+                        <!-- Efecto de fondo animado -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-primary-50 to-blue-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div class="relative z-10">
+                            <div class="text-center mb-6">
+                                <div class="text-4xl mb-4 transform group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">✨</div>
+                                <h3 class="text-2xl font-bold text-gray-900 group-hover:text-primary-700 transition-colors duration-300">CALIDAD</h3>
+                            </div>
+                            <p class="text-gray-700 text-center leading-relaxed group-hover:text-gray-800 transition-colors duration-300">
+                                Son compromisos de calidad para nuestros servicios, garantizando la excelencia en cada detalle de la experiencia de nuestros huéspedes.
+                            </p>
+                        </div>
+                        <!-- Brillo sutil al hacer hover -->
+                        <div class="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-pulse"></div>
+                    </div>
+
+                    <!-- Trabajo en Equipo -->
+                    <div class="group bg-white rounded-xl p-8 shadow-lg border-l-4 border-green-500 hover:shadow-2xl hover:border-green-600 hover:-translate-y-2 hover:scale-105 transition-all duration-500 ease-out cursor-pointer relative overflow-hidden">
+                        <!-- Efecto de fondo animado -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-green-50 to-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div class="relative z-10">
+                            <div class="text-center mb-6">
+                                <div class="text-4xl mb-4 transform group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">🤝</div>
+                                <h3 class="text-2xl font-bold text-gray-900 group-hover:text-green-700 transition-colors duration-300">TRABAJO EN EQUIPO</h3>
+                            </div>
+                            <p class="text-gray-700 text-center leading-relaxed group-hover:text-gray-800 transition-colors duration-300">
+                                La clave de nuestro éxito es el capital humano, un equipo que trabaja conjuntamente para lograr la satisfacción del cliente y la de uno mismo.
+                            </p>
+                        </div>
+                        <!-- Brillo sutil al hacer hover -->
+                        <div class="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-pulse"></div>
+                    </div>
+
+                    <!-- Confianza -->
+                    <div class="group bg-white rounded-xl p-8 shadow-lg border-l-4 border-yellow-500 hover:shadow-2xl hover:border-yellow-600 hover:-translate-y-2 hover:scale-105 transition-all duration-500 ease-out cursor-pointer relative overflow-hidden">
+                        <!-- Efecto de fondo animado -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-yellow-50 to-amber-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div class="relative z-10">
+                            <div class="text-center mb-6">
+                                <div class="text-4xl mb-4 transform group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">🛡️</div>
+                                <h3 class="text-2xl font-bold text-gray-900 group-hover:text-yellow-700 transition-colors duration-300">CONFIANZA</h3>
+                            </div>
+                            <p class="text-gray-700 text-center leading-relaxed group-hover:text-gray-800 transition-colors duration-300">
+                                Cada vez que nos visitan es un nuevo reto para nosotros, conseguir que su próxima visita sea todavía mejor que la anterior y ofreciéndoles unos servicios e instalaciones con la mejor calidad, que mejoramos y modernizamos año tras año.
+                            </p>
+                        </div>
+                        <!-- Brillo sutil al hacer hover -->
+                        <div class="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-pulse"></div>
+                    </div>
+
+                    <!-- Servicio Excepcional -->
+                    <div class="group bg-white rounded-xl p-8 shadow-lg border-l-4 border-red-500 hover:shadow-2xl hover:border-red-600 hover:-translate-y-2 hover:scale-105 transition-all duration-500 ease-out cursor-pointer relative overflow-hidden">
+                        <!-- Efecto de fondo animado -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-red-50 to-pink-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div class="relative z-10">
+                            <div class="text-center mb-6">
+                                <div class="text-4xl mb-4 transform group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">⭐</div>
+                                <h3 class="text-2xl font-bold text-gray-900 group-hover:text-red-700 transition-colors duration-300">SERVICIO EXCEPCIONAL</h3>
+                            </div>
+                            <p class="text-gray-700 text-center leading-relaxed group-hover:text-gray-800 transition-colors duration-300">
+                                El servicio de la mejor calidad siempre atraerá a los clientes. Entregarlo de esa manera debe ser una norma, manteniendo el mismo nivel de servicio en cada oportunidad que se interactúe con nuestros huéspedes.
+                            </p>
+                        </div>
+                        <!-- Brillo sutil al hacer hover -->
+                        <div class="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-pulse"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Instalaciones y Servicios -->
+    <section class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Nuestras Instalaciones</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Modernas instalaciones pensadas para brindar el máximo confort y satisfacción a nuestros huéspedes
+                </p>
+                <div class="w-20 h-1 bg-primary-600 mx-auto mt-6"></div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <!-- Habitaciones Confortables -->
+                <div class="text-center bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+                    <div class="text-5xl text-primary-600 mb-6">🛏️</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Habitaciones Confortables</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        20 habitaciones equipadas con todas las comodidades modernas para garantizar un descanso reparador.
+                    </p>
+                </div>
+
+                <!-- Piscina y Spa -->
+                <div class="text-center bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+                    <div class="text-5xl text-primary-600 mb-6">🏊</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Piscina y Spa</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Instalaciones de relajación y bienestar para que disfrutes de momentos de tranquilidad y renovación.
+                    </p>
+                </div>
+
+                <!-- Servicios Personalizados -->
+                <div class="text-center bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+                    <div class="text-5xl text-primary-600 mb-6">🎯</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Atención Personalizada</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Servicio familiar y cercano que nos diferencia, con atención individualizada para cada huésped.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Horarios y Contacto -->
+    <section class="py-20 bg-primary-600 text-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Información de Contacto</h2>
+                <div class="w-20 h-1 bg-yellow-400 mx-auto"></div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-12 text-center">
+                <!-- Horarios -->
+                <div class="bg-white/10 rounded-xl p-8">
+                    <div class="text-4xl mb-6">🕐</div>
+                    <h3 class="text-2xl font-bold mb-6">Horarios de Atención</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="font-semibold text-lg">Entre semana:</p>
+                            <p class="text-primary-200 text-xl">8:00 – 20:00</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-lg">Fin de semana:</p>
+                            <p class="text-primary-200 text-xl">9:00 – 18:00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ubicación -->
+                <div class="bg-white/10 rounded-xl p-8">
+                    <div class="text-4xl mb-6">📍</div>
+                    <h3 class="text-2xl font-bold mb-6">Nuestra Ubicación</h3>
+                    <div class="space-y-4">
+                        <p class="text-primary-100">
+                            Calle 123 #45-67<br>
+                            Centro, Bogotá<br>
+                            Colombia
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Contacto -->
+                <div class="bg-white/10 rounded-xl p-8">
+                    <div class="text-4xl mb-6">📞</div>
+                    <h3 class="text-2xl font-bold mb-6">Contáctanos</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="font-semibold">Teléfono:</p>
+                            <a href="tel:+573001234567" class="text-primary-200 hover:text-white text-lg">
+                                +57 (300) 123-4567
+                            </a>
+                        </div>
+                        <div>
+                            <p class="font-semibold">Email:</p>
+                            <a href="mailto:kokocardenas7011@gmail.com" class="text-primary-200 hover:text-white">
+                                kokocardenas7011@gmail.com
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="text-center mt-16">
+                <a href="/" class="inline-block bg-yellow-400 text-primary-900 font-bold text-xl px-12 py-4 rounded-full hover:bg-yellow-300 transition-colors shadow-lg">
+                    🏨 Hacer una Reserva
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Opening Hours -->
+                <div>
+                    <h4 class="text-xl font-bold mb-6">Horarios de Atención</h4>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span>Entre semana:</span>
+                            <span class="text-gray-300">8:00–20:00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Fin de semana:</span>
+                            <span class="text-gray-300">9:00–18:00</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm mt-6">
+                        © 2025 Hotel Sol. Todos los derechos reservados.
+                    </p>
+                </div>
+                
+                <!-- Address -->
+                <div>
+                    <h4 class="text-xl font-bold mb-6">Dirección</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-map-marker-alt text-primary-500 mt-1"></i>
+                            <span class="text-gray-300">Calle 123 #45-67, Centro, Bogotá, Colombia</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-phone text-primary-500"></i>
+                            <a href="tel:+573001234567" class="text-gray-300 hover:text-white">+57 (300) 123-4567</a>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-envelope text-primary-500"></i>
+                            <a href="mailto:kokocardenas7011@gmail.com" class="text-gray-300 hover:text-white">kokocardenas7011@gmail.com</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Newsletter -->
+                <div>
+                    <h4 class="text-xl font-bold mb-6">Boletín Informativo</h4>
+                    <form class="flex">
+                        <input 
+                            type="email" 
+                            placeholder="Ingrese su correo electrónico"
+                            class="flex-1 px-4 py-2 rounded-l-lg text-gray-900"
+                        />
+                        <button class="bg-primary-600 hover:bg-primary-700 px-6 py-2 rounded-r-lg transition-colors">
+                            Suscribirse
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

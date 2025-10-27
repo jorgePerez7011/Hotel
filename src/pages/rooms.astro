@@ -1,0 +1,23 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Habitaciones - Hotel Sol">
+  <div id="room-gallery-app"></div>
+</Layout>
+
+<script>
+  import RoomGallery from '../components/vue/RoomGallery.vue';
+  import { createApp } from 'vue';
+
+  // Crear y montar la aplicación Vue
+  const app = createApp(RoomGallery);
+  app.mount('#room-gallery-app');
+</script>
+
+<style>
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+</style>
