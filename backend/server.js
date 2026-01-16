@@ -4,6 +4,12 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -51,6 +57,10 @@ app.use(express.urlencoded({ extended: true }));
 // Logging middleware
 app.use(morgan('combined'));
 
+// Servir archivos estáticos de Astro
+const distPath = path.join(__dirname, '..', 'dist');
+app.use(express.static(distPath));
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ 
@@ -76,7 +86,10 @@ app.use('/api/reports', reportsRoutes);
 app.use('/api/companies', companiesRoutes);
 app.use('/api/invoices', invoicesRoutes);
 
-// 404 handler
+// SPA fallback - sirve index.html para rutas no encontradas
+app.get('*', (req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'));
+});
 app.use('*', (req, res) => {
   res.status(404).json({ 
     error: 'Route not found',
