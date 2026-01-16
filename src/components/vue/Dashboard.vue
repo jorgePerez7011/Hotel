@@ -1389,7 +1389,7 @@ onUnmounted(() => {
 // Load occupancy data
 const loadOccupancyData = async () => {
   try {
-    const response = await fetch('http://localhost:4000/api/hotel/rooms');
+    const response = await fetch('/api/hotel/rooms');
     const data = await response.json();
     
     if (data.success && data.summary) {
@@ -1459,7 +1459,7 @@ const handleStatClick = (statTitle) => {
 
 const loadMonthlyIncome = async () => {
   try {
-    const response = await fetch('http://localhost:4000/api/handovers/monthly-income');
+    const response = await fetch('/api/handovers/monthly-income');
     const data = await response.json();
     
     if (data.success && data.data) {
@@ -1489,8 +1489,8 @@ const loadMonthlyIncomeDetails = async () => {
   console.log('📥 Iniciando carga de detalles de ingresos...');
   try {
     // Cargar todos los datos sin filtro de fecha para permitir filtrado posterior
-    const checkoutResponse = await fetch('http://localhost:4000/api/bookings');
-    const handoverResponse = await fetch('http://localhost:4000/api/handovers');
+    const checkoutResponse = await fetch('/api/bookings');
+    const handoverResponse = await fetch('/api/handovers');
     
     const checkoutData = await checkoutResponse.json();
     const handoverData = await handoverResponse.json();
@@ -1777,7 +1777,7 @@ const loadTodaysBookings = async () => {
 // Load recent bookings (últimas 5 reservas sin importar la fecha)
 const loadRecentBookings = async () => {
   try {
-    const response = await fetch('http://localhost:4000/api/bookings');
+    const response = await fetch('/api/bookings');
     const data = await response.json();
     
     if (data.success && Array.isArray(data.bookings)) {
@@ -2022,7 +2022,7 @@ watch(
 const fetchReservedRooms = async () => {
   loading.value = true;
   try {
-    const response = await fetch('http://localhost:4000/api/hotel/rooms');
+    const response = await fetch('/api/hotel/rooms');
     const data = await response.json();
     
     if (data.success && Array.isArray(data.rooms)) {
@@ -2087,7 +2087,7 @@ watch(
 const fetchAvailableRooms = async () => {
   loading.value = true;
   try {
-    const response = await fetch('http://localhost:4000/api/hotel/rooms');
+    const response = await fetch('/api/hotel/rooms');
     const data = await response.json();
     
     if (data.success) {

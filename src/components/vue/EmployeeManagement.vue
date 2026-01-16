@@ -421,7 +421,7 @@ const filteredEmployees = computed(() => {
 const loadEmployees = async () => {
   try {
     loading.value = true;
-    const response = await fetch('http://localhost:4000/api/employees');
+    const response = await fetch('/api/employees');
     
     if (response.ok) {
       const data = await response.json();
@@ -498,7 +498,7 @@ const saveEmployee = async () => {
       });
     } else {
       // Create new employee
-      response = await fetch('http://localhost:4000/api/employees', {
+      response = await fetch('/api/employees', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

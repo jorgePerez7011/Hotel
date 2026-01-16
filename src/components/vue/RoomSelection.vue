@@ -160,7 +160,7 @@ const loadAvailableRooms = async () => {
     
     if (!searchCriteria.value) {
       // If no search criteria, show only available rooms
-      const response = await fetch('http://localhost:4000/api/hotel/rooms');
+      const response = await fetch('/api/hotel/rooms');
       if (response.ok) {
         const data = await response.json();
         // Filter only available rooms

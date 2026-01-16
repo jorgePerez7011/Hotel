@@ -441,7 +441,7 @@ const submitBooking = async () => {
   
   try {
     // 1. Verificar disponibilidad
-    const availabilityResponse = await fetch('http://localhost:4000/api/hotel/check-availability', {
+    const availabilityResponse = await fetch('/api/hotel/check-availability', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -464,7 +464,7 @@ const submitBooking = async () => {
     }
 
     // 2. Enviar solicitud de reserva por email
-    const bookingResponse = await fetch('http://localhost:4000/api/hotel/booking-request', {
+    const bookingResponse = await fetch('/api/hotel/booking-request', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -638,7 +638,7 @@ const nextStep = async () => {
     // Cargar habitaciones disponibles
     loadingRooms.value = true;
     try {
-      const response = await fetch('http://localhost:4000/api/hotel/rooms');
+      const response = await fetch('/api/hotel/rooms');
       const data = await response.json();
       if (data.success && Array.isArray(data.rooms)) {
         availableRooms.value = data.rooms.filter(room => 
@@ -685,7 +685,7 @@ const submitForm = async () => {
       status: 'confirmed'
     };
 
-    const response = await fetch('http://localhost:4000/api/bookings', {
+    const response = await fetch('/api/bookings', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -722,7 +722,7 @@ const handleSuccessClose = () => {
 const fetchAllBookings = async () => {
   loadingBookings.value = true;
   try {
-    const response = await fetch('http://localhost:4000/api/bookings');
+    const response = await fetch('/api/bookings');
     const data = await response.json();
     if (data.success && Array.isArray(data.bookings)) {
       allBookings.value = data.bookings;

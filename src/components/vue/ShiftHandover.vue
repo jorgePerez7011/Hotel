@@ -395,7 +395,7 @@ const loadHandovers = async () => {
 
 const loadEmployees = async () => {
   try {
-    const response = await fetch('http://localhost:4000/api/employees');
+    const response = await fetch('/api/employees');
     if (response.ok) {
       const data = await response.json();
       employees.value = data.employees || [];
@@ -409,7 +409,7 @@ const createHandover = async () => {
   try {
     isSubmitting.value = true;
     
-    const response = await fetch('http://localhost:4000/api/handovers', {
+    const response = await fetch('/api/handovers', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

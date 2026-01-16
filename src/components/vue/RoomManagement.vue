@@ -1121,7 +1121,7 @@ export default {
     const fetchRooms = async () => {
       loading.value = true
       try {
-        const response = await fetch('http://localhost:4000/api/hotel/rooms')
+        const response = await fetch('/api/hotel/rooms')
         const data = await response.json()
         
         if (data.success) {
@@ -1355,7 +1355,7 @@ export default {
 
       try {
         // Crear la factura
-        const invoiceResponse = await fetch('http://localhost:4000/api/invoices', {
+        const invoiceResponse = await fetch('/api/invoices', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -1578,7 +1578,7 @@ export default {
 
         console.log('Enviando datos de reserva:', reservationData)
 
-        const response = await fetch('http://localhost:4000/api/bookings', {
+        const response = await fetch('/api/bookings', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

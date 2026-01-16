@@ -663,7 +663,7 @@ const submitBooking = async () => {
     }
 
     // Send booking request email
-    const bookingRequestResponse = await fetch('http://localhost:4000/api/hotel/booking-request', {
+    const bookingRequestResponse = await fetch('/api/hotel/booking-request', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

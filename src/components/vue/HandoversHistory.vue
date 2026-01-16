@@ -231,7 +231,7 @@ export default {
     const loadHandovers = async () => {
       try {
         loading.value = true;
-        let url = 'http://localhost:4000/api/handovers';
+        let url = '/api/handovers';
         
         if (filterDate.value) {
           url = `http://localhost:4000/api/handovers/date/${filterDate.value}`;

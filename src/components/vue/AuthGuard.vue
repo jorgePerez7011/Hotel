@@ -15,7 +15,7 @@ export default defineComponent({
       }
       
       // Opcional: Verificar validez del token con el servidor
-      fetch('http://localhost:4000/api/auth/verify', {
+      fetch('/api/auth/verify', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`

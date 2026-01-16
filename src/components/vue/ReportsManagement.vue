@@ -1691,7 +1691,7 @@ export default {
         const method = this.editingInvoiceId ? 'PUT' : 'POST';
         const url = this.editingInvoiceId 
           ? `http://localhost:4000/api/invoices/${this.editingInvoiceId}`
-          : 'http://localhost:4000/api/invoices';
+          : '/api/invoices';
 
         const response = await fetch(url, {
           method,

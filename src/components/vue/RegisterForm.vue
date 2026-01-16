@@ -335,7 +335,7 @@ const handleRegister = async () => {
 
     // Call API
     const token = localStorage.getItem('hotelToken');
-    const response = await fetch('http://localhost:4000/api/employees', {
+    const response = await fetch('/api/employees', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -785,7 +785,7 @@ const saveNewCompany = async () => {
   formError.value = '';
   try {
     // Enviar a la API
-    const response = await fetch('http://localhost:4000/api/companies', {
+    const response = await fetch('/api/companies', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -842,7 +842,7 @@ const selectRoom = (room) => {
 
 const loadAllRooms = async () => {
   try {
-    const response = await fetch('http://localhost:4000/api/hotel/rooms');
+    const response = await fetch('/api/hotel/rooms');
     const data = await response.json();
     
     if (data.success) {
@@ -936,7 +936,7 @@ const closeCompanyCheckinModal = () => {
 const loadCompanies = async () => {
   loading.value = true;
   try {
-    const response = await fetch('http://localhost:4000/api/companies');
+    const response = await fetch('/api/companies');
     const data = await response.json();
 
     if (data.success) {
@@ -1123,7 +1123,7 @@ const submitCompanyCheckin = async () => {
     };
 
     // Call API to create company booking
-    const response = await fetch('http://localhost:4000/api/bookings/company-checkin', {
+    const response = await fetch('/api/bookings/company-checkin', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

@@ -442,7 +442,7 @@ const loadMonthlyIncomeData = async () => {
     const formattedEnd = endOfMonth.toISOString().split('T')[0];
 
     // Obtener datos resumen del mes
-    const incomeResponse = await fetch('http://localhost:4000/api/handovers/monthly-income');
+    const incomeResponse = await fetch('/api/handovers/monthly-income');
     const incomeData = await incomeResponse.json();
     
     if (incomeData.success && incomeData.data) {
@@ -451,7 +451,7 @@ const loadMonthlyIncomeData = async () => {
     }
 
     // Obtener entregas del mes
-    const handoversResponse = await fetch('http://localhost:4000/api/handovers', {
+    const handoversResponse = await fetch('/api/handovers', {
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache'
@@ -472,7 +472,7 @@ const loadMonthlyIncomeData = async () => {
       }));
 
     // Obtener checkouts del mes
-    const checkoutsResponse = await fetch('http://localhost:4000/api/bookings', {
+    const checkoutsResponse = await fetch('/api/bookings', {
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache'

@@ -756,7 +756,7 @@ export default {
 
     const fetchEmployees = async () => {
       try {
-        const response = await fetch('http://localhost:4000/api/employees')
+        const response = await fetch('/api/employees')
         const data = await response.json()
         
         if (data.employees) {
@@ -861,7 +861,7 @@ export default {
           outgoing_signature: 'Firmado digitalmente'
         }
 
-        const response = await fetch('http://localhost:4000/api/handovers', {
+        const response = await fetch('/api/handovers', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
