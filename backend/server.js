@@ -29,15 +29,28 @@ import { connectMongoDB } from './config/mongodb.js';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https:", "http:"],
+      fontSrc: ["'self'", "data:"]
+    }
+  }
+}));
 app.use(cors({
   origin: [
     'http://localhost:3000',
     'http://localhost:3001',
-    process.env.FRONTEND_URL
+    'https://hotelsol.watersol.co',
+    process.env.FRONTEND_URL,
+    process.env.CORS_ORIGIN
   ].filter(Boolean),
   credentials: true
 }));
