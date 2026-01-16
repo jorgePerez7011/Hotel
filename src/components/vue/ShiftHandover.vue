@@ -30,29 +30,30 @@
       </div>
 
       <div v-else class="space-y-4">
+        <!-- Show only latest handover -->
         <div 
-          v-for="handover in handovers" 
-          :key="handover.id"
+          v-if="getLatestHandover()"
+          :key="getLatestHandover().id"
           class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
         >
           <!-- Header -->
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center space-x-3">
               <div class="flex items-center">
-                <div class="w-3 h-3 rounded-full mr-2" :class="getStatusColor(handover.status)"></div>
+                <div class="w-3 h-3 rounded-full mr-2" :class="getStatusColor(getLatestHandover().status)"></div>
                 <span class="font-semibold text-gray-800">
-                  {{ handover.outgoing_shift }} → {{ handover.incoming_shift }}
+                  {{ getLatestHandover().outgoing_shift }} → {{ getLatestHandover().incoming_shift }}
                 </span>
               </div>
               <span class="text-sm text-gray-600">
-                {{ formatTime(handover.handover_time) }}
+                {{ formatTime(getLatestHandover().handover_time) }}
               </span>
             </div>
             <span 
               class="px-3 py-1 rounded-full text-xs font-medium"
-              :class="getStatusBadgeClass(handover.status)"
+              :class="getStatusBadgeClass(getLatestHandover().status)"
             >
-              {{ getStatusText(handover.status) }}
+              {{ getStatusText(getLatestHandover().status) }}
             </span>
           </div>
 
@@ -61,15 +62,15 @@
             <div class="flex items-center">
               <i class="fas fa-arrow-right text-red-500 mr-2"></i>
               <div>
-                <p class="font-medium text-gray-800">{{ handover.outgoing_employee_name }}</p>
-                <p class="text-sm text-gray-600 capitalize">{{ handover.outgoing_employee_position }}</p>
+                <p class="font-medium text-gray-800">{{ getLatestHandover().outgoing_employee_name }}</p>
+                <p class="text-sm text-gray-600 capitalize">{{ getLatestHandover().outgoing_employee_position }}</p>
               </div>
             </div>
             <div class="flex items-center">
               <i class="fas fa-arrow-left text-green-500 mr-2"></i>
               <div>
-                <p class="font-medium text-gray-800">{{ handover.incoming_employee_name }}</p>
-                <p class="text-sm text-gray-600 capitalize">{{ handover.incoming_employee_position }}</p>
+                <p class="font-medium text-gray-800">{{ getLatestHandover().incoming_employee_name }}</p>
+                <p class="text-sm text-gray-600 capitalize">{{ getLatestHandover().incoming_employee_position }}</p>
               </div>
             </div>
           </div>
@@ -77,61 +78,69 @@
           <!-- Room Statistics -->
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3 p-3 bg-gray-50 rounded-lg">
             <div class="text-center">
-              <p class="text-2xl font-bold text-blue-600">{{ handover.rooms_occupied }}</p>
+              <p class="text-2xl font-bold text-blue-600">{{ getLatestHandover().rooms_occupied }}</p>
               <p class="text-xs text-gray-600">Ocupadas</p>
             </div>
             <div class="text-center">
-              <p class="text-2xl font-bold text-green-600">{{ handover.rooms_available }}</p>
+              <p class="text-2xl font-bold text-green-600">{{ getLatestHandover().rooms_available }}</p>
               <p class="text-xs text-gray-600">Disponibles</p>
             </div>
             <div class="text-center">
-              <p class="text-2xl font-bold text-orange-600">{{ handover.pending_checkouts }}</p>
+              <p class="text-2xl font-bold text-orange-600">{{ getLatestHandover().pending_checkouts }}</p>
               <p class="text-xs text-gray-600">Check-outs</p>
             </div>
             <div class="text-center">
-              <p class="text-2xl font-bold text-purple-600">{{ handover.pending_checkins }}</p>
+              <p class="text-2xl font-bold text-purple-600">{{ getLatestHandover().pending_checkins }}</p>
               <p class="text-xs text-gray-600">Check-ins</p>
             </div>
           </div>
 
           <!-- Notes (Expandable) -->
-          <div v-if="hasNotes(handover)" class="mt-3">
+          <div v-if="hasNotes(getLatestHandover())" class="mt-3">
             <button 
-              @click="toggleNotes(handover.id)"
+              @click="toggleNotes(getLatestHandover().id)"
               class="flex items-center text-sm text-blue-600 hover:text-blue-800 mb-2"
             >
-              <i class="fas" :class="expandedNotes.includes(handover.id) ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-              <span class="ml-1">{{ expandedNotes.includes(handover.id) ? 'Ocultar' : 'Ver' }} observaciones</span>
+              <i class="fas" :class="expandedNotes.includes(getLatestHandover().id) ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+              <span class="ml-1">{{ expandedNotes.includes(getLatestHandover().id) ? 'Ocultar' : 'Ver' }} observaciones</span>
             </button>
             
-            <div v-if="expandedNotes.includes(handover.id)" class="space-y-2 pl-4 border-l-2 border-blue-200">
-              <div v-if="handover.general_notes">
+            <div v-if="expandedNotes.includes(getLatestHandover().id)" class="space-y-2 pl-4 border-l-2 border-blue-200">
+              <div v-if="getLatestHandover().general_notes">
                 <p class="text-sm font-medium text-gray-700">Notas generales:</p>
-                <p class="text-sm text-gray-600">{{ handover.general_notes }}</p>
+                <p class="text-sm text-gray-600">{{ getLatestHandover().general_notes }}</p>
               </div>
-              <div v-if="handover.maintenance_issues">
+              <div v-if="getLatestHandover().maintenance_issues">
                 <p class="text-sm font-medium text-gray-700">Mantenimiento:</p>
-                <p class="text-sm text-gray-600">{{ handover.maintenance_issues }}</p>
+                <p class="text-sm text-gray-600">{{ getLatestHandover().maintenance_issues }}</p>
               </div>
-              <div v-if="handover.guest_requests">
+              <div v-if="getLatestHandover().guest_requests">
                 <p class="text-sm font-medium text-gray-700">Solicitudes huéspedes:</p>
-                <p class="text-sm text-gray-600">{{ handover.guest_requests }}</p>
+                <p class="text-sm text-gray-600">{{ getLatestHandover().guest_requests }}</p>
               </div>
-              <div v-if="handover.inventory_notes">
+              <div v-if="getLatestHandover().inventory_notes">
                 <p class="text-sm font-medium text-gray-700">Inventario:</p>
-                <p class="text-sm text-gray-600">{{ handover.inventory_notes }}</p>
+                <p class="text-sm text-gray-600">{{ getLatestHandover().inventory_notes }}</p>
               </div>
             </div>
           </div>
 
           <!-- Actions -->
-          <div v-if="handover.status === 'pending'" class="mt-4 pt-3 border-t">
+          <div class="mt-4 pt-3 border-t flex gap-2">
             <button 
-              @click="completeHandover(handover)"
-              class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
+              v-if="getLatestHandover().status === 'pending'"
+              @click="completeHandover(getLatestHandover())"
+              class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm flex-1"
             >
               <i class="fas fa-check mr-2"></i>
               Completar Entrega
+            </button>
+            <button 
+              @click="goToHandoverHistory"
+              class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm flex-1"
+            >
+              <i class="fas fa-history mr-2"></i>
+              Ver Historia
             </button>
           </div>
         </div>
@@ -519,6 +528,15 @@ const getStatusText = (status: string) => {
     reviewed: 'Revisada'
   };
   return texts[status] || 'Desconocido';
+};
+
+const getLatestHandover = () => {
+  if (handovers.value.length === 0) return null;
+  return handovers.value[handovers.value.length - 1];
+};
+
+const goToHandoverHistory = () => {
+  window.location.href = '/admin/handovers-history';
 };
 
 // Initialize

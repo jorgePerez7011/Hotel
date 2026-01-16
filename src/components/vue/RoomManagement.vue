@@ -1,5 +1,61 @@
 <template>
   <div class="min-h-screen bg-gray-100">
+    <!-- Notification Toast -->
+    <transition
+      enter-active-class="transition ease-out duration-300"
+      enter-from-class="opacity-0 transform translate-y-2"
+      enter-to-class="opacity-100 transform translate-y-0"
+      leave-active-class="transition ease-in duration-200"
+      leave-from-class="opacity-100 transform translate-y-0"
+      leave-to-class="opacity-0 transform translate-y-2"
+    >
+      <div 
+        v-if="notification.show"
+        class="fixed top-4 right-4 z-[100]"
+      >
+        <div 
+          class="rounded-lg shadow-lg p-4 max-w-md"
+          :class="notification.type === 'success' 
+            ? 'bg-green-50 border border-green-200' 
+            : 'bg-red-50 border border-red-200'"
+        >
+          <div class="flex items-start gap-3">
+            <div 
+              class="flex-shrink-0"
+              :class="notification.type === 'success' ? 'text-green-600' : 'text-red-600'"
+            >
+              <i 
+                :class="notification.type === 'success' 
+                  ? 'fas fa-check-circle text-2xl' 
+                  : 'fas fa-exclamation-circle text-2xl'"
+              ></i>
+            </div>
+            <div class="flex-1">
+              <h3 
+                class="font-semibold"
+                :class="notification.type === 'success' ? 'text-green-800' : 'text-red-800'"
+              >
+                {{ notification.title }}
+              </h3>
+              <p 
+                class="text-sm mt-1"
+                :class="notification.type === 'success' ? 'text-green-700' : 'text-red-700'"
+              >
+                {{ notification.message }}
+              </p>
+            </div>
+            <button 
+              @click="notification.show = false"
+              class="flex-shrink-0 ml-2"
+              :class="notification.type === 'success' ? 'text-green-400 hover:text-green-600' : 'text-red-400 hover:text-red-600'"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
     <!-- Header -->
     <header class="bg-white shadow-sm border-b">
       <div class="container mx-auto px-6 py-4">
@@ -130,7 +186,7 @@
           <!-- Room Header -->
           <div class="p-4 border-b">
             <div class="flex items-center justify-between mb-2">
-              <h3 class="text-lg font-bold text-gray-900">{{ room.number }}</h3>
+              <h3 class="text-lg font-bold text-gray-900">{{ room.room_number }}</h3>
               <span 
                 class="px-2 py-1 rounded-full text-xs font-medium"
                 :class="getStatusBadgeClass(room.current_status)"
@@ -139,8 +195,10 @@
               </span>
             </div>
             <div class="flex items-center justify-between text-sm text-gray-600">
-              <span class="capitalize">{{ room.type === 'standard' ? 'Estándar' : 'Ejecutiva' }}</span>
-              <span>Piso {{ room.floor }}</span>
+              <span class="capitalize font-medium text-gray-900">
+                {{ room.type === 'doble' ? 'Habitación Doble' : room.type === 'sencilla' ? 'Habitación Sencilla' : room.type === 'familiar' ? 'Habitación Familiar' : 'Estándar' }}
+              </span>
+              <span class="text-gray-500">Piso {{ room.floor }}</span>
             </div>
           </div>
 
@@ -149,7 +207,7 @@
             <!-- Price and Capacity -->
             <div class="flex items-center justify-between mb-3">
               <div class="text-sm">
-                <span class="font-medium text-gray-900">${{ room.price_per_night }}</span>
+                <span class="font-medium text-gray-900">COP {{ Number(room.price_per_night).toLocaleString() }}</span>
                 <span class="text-gray-600">/noche</span>
               </div>
               <div class="text-sm text-gray-600">
@@ -161,7 +219,12 @@
             <!-- Guest Information (if occupied/reserved) -->
             <div v-if="room.current_status === 'occupied' || room.current_status === 'reserved'" class="bg-gray-50 rounded-lg p-3 mb-3">
               <div class="text-sm">
-                <div class="font-medium text-gray-900 mb-1">{{ room.guest_name || 'Huésped' }}</div>
+                <div class="font-medium text-gray-900 mb-1">
+                  {{ room.guest_name || 'Huésped' }}
+                  <span v-if="room.company_name" class="ml-2 text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">
+                    {{ room.company_name }}
+                  </span>
+                </div>
                 <div class="text-gray-600">
                   <i class="fas fa-calendar mr-1"></i>
                   {{ formatDate(room.check_in_date) }} - {{ formatDate(room.check_out_date) }}
@@ -169,6 +232,14 @@
                 <div v-if="room.total_amount" class="text-gray-600 mt-1">
                   <i class="fas fa-dollar-sign mr-1"></i>
                   ${{ Number(room.total_amount).toFixed(2) }} total
+                </div>
+                <div v-if="room.guest_identification" class="text-gray-600 text-xs mt-1">
+                  <i class="fas fa-id-card mr-1"></i>
+                  {{ room.guest_identification }}
+                </div>
+                <div v-if="room.payment_type === 'company_contract'" class="text-purple-600 text-xs mt-1">
+                  <i class="fas fa-building mr-1"></i>
+                  Contrato Empresarial
                 </div>
               </div>
             </div>
@@ -239,7 +310,7 @@
         <div class="p-6">
           <div class="flex justify-between items-center mb-6">
             <h3 class="text-xl font-bold text-gray-900">
-              Habitación {{ selectedRoom?.number }}
+              Habitación {{ selectedRoom?.room_number }}
             </h3>
             <button 
               @click="showDetailsModal = false"
@@ -268,7 +339,7 @@
                 </div>
                 <div>
                   <span class="text-gray-600">Precio:</span>
-                  <span class="ml-2 font-medium">${{ selectedRoom.price_per_night }}/noche</span>
+                  <span class="ml-2 font-medium">COP {{ Number(selectedRoom.price_per_night).toLocaleString() }}/noche</span>
                 </div>
                 <div class="col-span-2">
                   <span class="text-gray-600">Estado:</span>
@@ -290,6 +361,11 @@
                   <span class="text-gray-600">Nombre:</span>
                   <span class="ml-2 font-medium">{{ selectedRoom.guest_name || 'N/A' }}</span>
                 </div>
+                <div v-if="selectedRoom.company_name" class="bg-purple-100 p-2 rounded border border-purple-300">
+                  <span class="text-purple-700 font-semibold">
+                    <i class="fas fa-building mr-1"></i>{{ selectedRoom.company_name }}
+                  </span>
+                </div>
                 <div v-if="selectedRoom.guest_email">
                   <span class="text-gray-600">Email:</span>
                   <span class="ml-2 font-medium">{{ selectedRoom.guest_email }}</span>
@@ -297,6 +373,10 @@
                 <div v-if="selectedRoom.guest_phone">
                   <span class="text-gray-600">Teléfono:</span>
                   <span class="ml-2 font-medium">{{ selectedRoom.guest_phone }}</span>
+                </div>
+                <div v-if="selectedRoom.guest_identification">
+                  <span class="text-gray-600">Identificación:</span>
+                  <span class="ml-2 font-medium">{{ selectedRoom.guest_identification }}</span>
                 </div>
                 <div>
                   <span class="text-gray-600">Check-in:</span>
@@ -310,9 +390,18 @@
                   <span class="text-gray-600">Noches:</span>
                   <span class="ml-2 font-medium">{{ selectedRoom.nights_booked }}</span>
                 </div>
+                <div v-if="selectedRoom.booking_price">
+                  <span class="text-gray-600">Precio/noche:</span>
+                  <span class="ml-2 font-medium">COP {{ Number(selectedRoom.booking_price).toLocaleString() }}</span>
+                </div>
                 <div v-if="selectedRoom.total_amount">
                   <span class="text-gray-600">Total:</span>
-                  <span class="ml-2 font-medium text-green-600">${{ Number(selectedRoom.total_amount).toFixed(2) }}</span>
+                  <span class="ml-2 font-medium text-green-600">COP {{ Number(selectedRoom.total_amount).toLocaleString() }}</span>
+                </div>
+                <div v-if="selectedRoom.payment_type === 'company_contract'" class="bg-yellow-100 p-2 rounded border border-yellow-300">
+                  <span class="text-yellow-700 font-semibold">
+                    <i class="fas fa-handshake mr-1"></i>Contrato Empresarial - Pago fin de mes
+                  </span>
                 </div>
               </div>
             </div>
@@ -397,7 +486,7 @@
         <div class="p-6">
           <div class="flex justify-between items-center mb-6">
             <h3 class="text-xl font-bold text-gray-900">
-              Reservar Habitación {{ reservationForm.room?.number }}
+              Reservar Habitación {{ reservationForm.room?.room_number }}
             </h3>
             <button 
               @click="closeReservationModal"
@@ -477,9 +566,9 @@
               <h4 class="font-medium text-gray-900 mb-3">Precio Personalizado</h4>
               <div class="space-y-3">
                 <div class="bg-gray-50 rounded-lg p-3">
-                  <div class="text-sm text-gray-600 mb-2">Precio base por noche: ${{ reservationForm.room?.base_price }}</div>
+                  <div class="text-sm text-gray-600 mb-2">Precio base por noche: COP {{ Number((reservationForm.room?.base_price || 0) * 1000).toLocaleString() }}</div>
                   <div class="text-sm text-gray-600">Noches: {{ reservationForm.nights }}</div>
-                  <div class="text-sm text-gray-600">Subtotal: ${{ (reservationForm.room?.base_price * reservationForm.nights).toFixed(2) }}</div>
+                  <div class="text-sm text-gray-600">Subtotal: COP {{ Number((reservationForm.room?.base_price || 0) * 1000 * reservationForm.nights).toLocaleString() }}</div>
                 </div>
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">Precio por Noche (Personalizado)</label>
@@ -534,6 +623,49 @@
     </div>
 
     <!-- Status Change Confirmation Modal -->
+    <!-- Check-in Confirmation Modal -->
+    <div v-if="showCheckinConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg max-w-md w-full shadow-2xl">
+        <div class="p-6">
+          <div class="flex items-center justify-center mb-6">
+            <div class="bg-green-100 rounded-full p-3 mr-4">
+              <i class="fas fa-door-open text-green-600 text-2xl"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-gray-900">Confirmar Check-in</h3>
+              <p class="text-gray-600 text-sm mt-1">¿Proceder con el check-in?</p>
+            </div>
+          </div>
+
+          <div class="bg-green-50 rounded-lg p-4 mb-6">
+            <div class="text-sm space-y-2">
+              <p><strong>Habitación:</strong> {{ checkinConfirmData.room?.room_number }}</p>
+              <p v-if="checkinConfirmData.room?.guest_name"><strong>Huésped:</strong> {{ checkinConfirmData.room?.guest_name }}</p>
+              <p v-if="checkinConfirmData.room?.check_in_date"><strong>Check-in:</strong> {{ formatDate(checkinConfirmData.room?.check_in_date) }}</p>
+              <p v-if="checkinConfirmData.room?.check_out_date"><strong>Check-out:</strong> {{ formatDate(checkinConfirmData.room?.check_out_date) }}</p>
+            </div>
+          </div>
+
+          <div class="flex space-x-3">
+            <button
+              @click="showCheckinConfirmModal = false"
+              class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
+            >
+              <i class="fas fa-times mr-2"></i>
+              Cancelar
+            </button>
+            <button
+              @click="confirmCheckin"
+              class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+            >
+              <i class="fas fa-check mr-2"></i>
+              Confirmar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div v-if="showStatusChangeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-lg max-w-md w-full">
         <div class="p-6">
@@ -549,7 +681,7 @@
 
           <div class="bg-gray-50 rounded-lg p-4 mb-6">
             <div class="text-sm">
-              <p><strong>Habitación:</strong> {{ statusChangeData.room?.number }}</p>
+              <p><strong>Habitación:</strong> {{ statusChangeData.room?.room_number }}</p>
               <p><strong>Estado actual:</strong> 
                 <span :class="getStatusBadgeClass(statusChangeData.room?.current_status)">
                   {{ getStatusText(statusChangeData.room?.current_status) }}
@@ -579,6 +711,298 @@
               Confirmar
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Checkout Confirmation Modal with Invoice Option -->
+    <div v-if="showCheckoutConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg w-full max-w-md shadow-2xl">
+        <div class="p-6">
+          <div class="flex items-center justify-center mb-4">
+            <div class="bg-blue-100 p-4 rounded-full">
+              <i class="fas fa-door-open text-blue-600 text-3xl"></i>
+            </div>
+          </div>
+          
+          <h3 class="text-2xl font-bold text-gray-900 text-center mb-2">Confirmar Check-out</h3>
+          <p class="text-gray-600 text-center mb-4">
+            Habitación <strong>{{ checkoutConfirmData.room?.room_number }}</strong>
+          </p>
+          <p class="text-gray-600 text-center mb-6">
+            Huésped: <strong>{{ checkoutConfirmData.room?.guest_name }}</strong>
+          </p>
+
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p class="text-gray-800 font-medium mb-2">¿El huésped necesita factura?</p>
+            <p class="text-sm text-gray-600">Selecciona una opción para continuar</p>
+          </div>
+          
+          <div class="flex flex-col gap-3">
+            <button 
+              @click="confirmCheckoutWithoutInvoice"
+              class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+            >
+              <i class="fas fa-check"></i>
+              Sin Factura
+            </button>
+            <button 
+              @click="openInvoiceModal"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+            >
+              <i class="fas fa-file-invoice-dollar"></i>
+              Crear Factura
+            </button>
+            <button 
+              @click="cancelCheckout"
+              class="bg-gray-300 hover:bg-gray-400 text-gray-900 px-6 py-3 rounded-lg font-semibold transition-colors"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Invoice Creation Modal -->
+    <div v-if="showInvoiceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div class="p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-2xl font-bold text-gray-900">
+              <i class="fas fa-file-invoice-dollar mr-2 text-blue-600"></i>
+              Crear Factura
+            </h3>
+            <button 
+              @click="showInvoiceModal = false"
+              class="text-gray-500 hover:text-gray-700"
+            >
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+
+          <form @submit.prevent="saveInvoiceAndCheckout" class="space-y-4">
+            <!-- Row 1: Invoice Number & Date -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Nº Factura *</label>
+                <input 
+                  v-model="invoiceForm.invoice_number" 
+                  type="text" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  placeholder="FAC-001"
+                  required
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Factura</label>
+                <input 
+                  v-model="invoiceForm.invoice_date" 
+                  type="date" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <!-- Row 2: Guest Name & Identification -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Razón Social / Nombre *</label>
+                <input 
+                  v-model="invoiceForm.guest_name" 
+                  type="text" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">NIT / CC *</label>
+                <input 
+                  v-model="invoiceForm.guest_identification" 
+                  type="text" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  placeholder="123456789"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Row 3: Email, Phone & Address -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+                <input 
+                  v-model="invoiceForm.guest_email" 
+                  type="email" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+                <input 
+                  v-model="invoiceForm.guest_phone" 
+                  type="tel" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  placeholder="+57 300 123 4567"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Dirección</label>
+                <input 
+                  v-model="invoiceForm.guest_address" 
+                  type="text" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  placeholder="Calle 123 Apt 4B"
+                />
+              </div>
+            </div>
+
+            <!-- Row 4: City & Room -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Ciudad</label>
+                <input 
+                  v-model="invoiceForm.guest_city" 
+                  type="text" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  placeholder="Bogotá"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Habitación</label>
+                <input 
+                  v-model="invoiceForm.room_number" 
+                  type="text" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  readonly
+                />
+              </div>
+            </div>
+
+            <!-- Row 5: Stay Dates -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Check-in</label>
+                <input 
+                  v-model="invoiceForm.check_in_date" 
+                  type="date" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  readonly
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Check-out</label>
+                <input 
+                  v-model="invoiceForm.check_out_date" 
+                  type="date" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  readonly
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Noches</label>
+                <input 
+                  v-model="invoiceForm.nights" 
+                  type="number" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  readonly
+                />
+              </div>
+            </div>
+
+            <!-- Row 4: Amounts -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Subtotal</label>
+                <input 
+                  v-model="invoiceForm.subtotal" 
+                  type="number" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  step="0.01"
+                  min="0"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Impuesto/IVA</label>
+                <input 
+                  v-model="invoiceForm.tax" 
+                  type="number" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                  step="0.01"
+                  min="0"
+                  @input="invoiceForm.total = (parseFloat(invoiceForm.subtotal) || 0) + (parseFloat(invoiceForm.tax) || 0)"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Total *</label>
+                <input 
+                  v-model="invoiceForm.total" 
+                  type="number" 
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 bg-green-50 font-bold"
+                  step="0.01"
+                  min="0"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Row 5: Payment & Notes -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Método de Pago</label>
+                <select 
+                  v-model="invoiceForm.payment_method"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Selecciona...</option>
+                  <option value="efectivo">Efectivo</option>
+                  <option value="tarjeta">Tarjeta</option>
+                  <option value="transferencia">Transferencia</option>
+                  <option value="cheque">Cheque</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                <select 
+                  v-model="invoiceForm.status"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="emitida">Emitida</option>
+                  <option value="pagada">Pagada</option>
+                  <option value="cancelada">Cancelada</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Notes -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Notas</label>
+              <textarea 
+                v-model="invoiceForm.notes" 
+                rows="2"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                placeholder="Notas adicionales..."
+              ></textarea>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-3 justify-end pt-4 border-t">
+              <button 
+                type="button"
+                @click="showInvoiceModal = false"
+                class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+              >
+                Cancelar
+              </button>
+              <button 
+                type="submit"
+                class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2"
+              >
+                <i class="fas fa-save"></i>
+                Crear Factura y Check-out
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -621,6 +1045,47 @@ export default {
       newStatus: ''
     })
 
+    // Checkout Confirmation Modal
+    const showCheckoutConfirmModal = ref(false)
+    const showInvoiceModal = ref(false)
+    const nextInvoiceNumber = ref(1)
+    const notification = ref({
+      show: false,
+      type: 'success', // 'success' o 'error'
+      title: '',
+      message: ''
+    })
+    const checkoutConfirmData = ref({
+      room: null,
+      needsInvoice: null
+    })
+    const invoiceForm = ref({
+      invoice_number: '',
+      invoice_date: new Date().toISOString().split('T')[0],
+      guest_name: '',
+      guest_identification: '', // NIT/CC
+      guest_email: '',
+      guest_phone: '',
+      guest_address: '',
+      guest_city: '',
+      room_number: '',
+      check_in_date: '',
+      check_out_date: '',
+      nights: '',
+      subtotal: 0,
+      tax: 0,
+      total: 0,
+      payment_method: '',
+      status: 'emitida',
+      notes: ''
+    })
+
+    // Check-in Confirmation Modal
+    const showCheckinConfirmModal = ref(false)
+    const checkinConfirmData = ref({
+      room: null
+    })
+
     const roomSummary = computed(() => {
       return {
         total: rooms.value.length,
@@ -660,7 +1125,10 @@ export default {
         const data = await response.json()
         
         if (data.success) {
-          rooms.value = data.rooms
+          rooms.value = data.rooms.map(room => ({
+            ...room,
+            price_per_night: parseInt(room.price_per_night || room.base_price || 0)
+          }))
         } else {
           console.error('Error fetching rooms:', data.error)
         }
@@ -739,9 +1207,14 @@ export default {
 
     // Check-in and Check-out Functions
     const performCheckin = async (room) => {
-      if (!confirm(`¿Confirmar check-in para la habitación ${room.room_number}?`)) {
-        return
-      }
+      // Mostrar modal de confirmación
+      checkinConfirmData.value.room = room
+      showCheckinConfirmModal.value = true
+    }
+
+    const confirmCheckin = async () => {
+      const room = checkinConfirmData.value.room
+      if (!room) return
 
       try {
         const response = await fetch(`http://localhost:4000/api/hotel/rooms/${room.id}/checkin`, {
@@ -764,22 +1237,51 @@ export default {
             rooms.value[roomIndex].status = 'occupied'
           }
           
-          alert(`Check-in realizado exitosamente para la habitación ${room.room_number}`)
+          // Mostrar notificación de éxito
+          notification.value = {
+            show: true,
+            type: 'success',
+            title: '✅ Check-in Exitoso',
+            message: `Check-in realizado para la habitación ${room.room_number}`
+          }
+          setTimeout(() => {
+            notification.value.show = false
+          }, 3000)
+
           showDetailsModal.value = false
+          showCheckinConfirmModal.value = false
           await fetchRooms()
         } else {
-          alert('Error realizando check-in: ' + data.error)
+          notification.value = {
+            show: true,
+            type: 'error',
+            title: '❌ Error',
+            message: 'Error realizando check-in: ' + data.error
+          }
         }
       } catch (error) {
         console.error('Error performing check-in:', error)
-        alert('Error al realizar el check-in')
+        notification.value = {
+          show: true,
+          type: 'error',
+          title: '❌ Error',
+          message: 'Error al realizar el check-in'
+        }
       }
     }
 
     const performCheckout = async (room) => {
-      if (!confirm(`¿Confirmar check-out para la habitación ${room.room_number}?`)) {
-        return
+      // Abrir modal de confirmación con opción de factura
+      checkoutConfirmData.value = {
+        room: room,
+        needsInvoice: null
       }
+      showCheckoutConfirmModal.value = true
+    }
+
+    const confirmCheckoutWithoutInvoice = async () => {
+      const room = checkoutConfirmData.value.room
+      if (!room) return
 
       try {
         const response = await fetch(`http://localhost:4000/api/hotel/rooms/${room.id}/checkout`, {
@@ -795,7 +1297,6 @@ export default {
         const data = await response.json()
 
         if (data.success) {
-          // Actualizar el estado local
           const roomIndex = rooms.value.findIndex(r => r.id === room.id)
           if (roomIndex !== -1) {
             rooms.value[roomIndex].current_status = 'cleaning'
@@ -804,6 +1305,7 @@ export default {
           
           alert(`Check-out realizado exitosamente para la habitación ${room.room_number}`)
           showDetailsModal.value = false
+          showCheckoutConfirmModal.value = false
           await fetchRooms()
         } else {
           alert('Error realizando check-out: ' + data.error)
@@ -812,6 +1314,141 @@ export default {
         console.error('Error performing check-out:', error)
         alert('Error al realizar el check-out')
       }
+    }
+
+    const openInvoiceModal = () => {
+      const room = checkoutConfirmData.value.room
+      if (!room) return
+
+      // Generar número de factura secuencial
+      const autoNumber = String(nextInvoiceNumber.value).padStart(3, '0')
+
+      // Pre-llenar el formulario de factura
+      invoiceForm.value = {
+        invoice_number: autoNumber,
+        invoice_date: new Date().toISOString().split('T')[0],
+        guest_name: room.guest_name || '',
+        guest_identification: room.guest_identification || '',
+        guest_email: room.guest_email || '',
+        guest_phone: room.guest_phone || '',
+        guest_address: room.guest_address || '',
+        guest_city: room.guest_city || '',
+        room_number: room.room_number,
+        check_in_date: formatDateForInput(room.check_in_date),
+        check_out_date: formatDateForInput(room.check_out_date),
+        nights: room.nights_booked || '',
+        subtotal: parseFloat(room.total_amount) || 0,
+        tax: 0,
+        total: parseFloat(room.total_amount) || 0,
+        payment_method: '',
+        status: 'emitida',
+        notes: ''
+      }
+
+      showCheckoutConfirmModal.value = false
+      showInvoiceModal.value = true
+    }
+
+    const saveInvoiceAndCheckout = async () => {
+      const room = checkoutConfirmData.value.room
+      if (!room) return
+
+      try {
+        // Crear la factura
+        const invoiceResponse = await fetch('http://localhost:4000/api/invoices', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(invoiceForm.value)
+        })
+
+        const invoiceData = await invoiceResponse.json()
+
+        if (!invoiceData.success) {
+          notification.value = {
+            show: true,
+            type: 'error',
+            title: 'Error en la Factura',
+            message: invoiceData.message || 'No se pudo crear la factura'
+          }
+          setTimeout(() => {
+            notification.value.show = false
+          }, 5000)
+          return
+        }
+
+        // Incrementar el contador de facturas
+        nextInvoiceNumber.value++
+
+        // Luego realizar el checkout
+        const checkoutResponse = await fetch(`http://localhost:4000/api/hotel/rooms/${room.id}/checkout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            checkout_time: new Date().toISOString(),
+            invoice_number: invoiceForm.value.invoice_number
+          })
+        })
+
+        const checkoutData = await checkoutResponse.json()
+
+        if (checkoutData.success) {
+          const roomIndex = rooms.value.findIndex(r => r.id === room.id)
+          if (roomIndex !== -1) {
+            rooms.value[roomIndex].current_status = 'cleaning'
+            rooms.value[roomIndex].status = 'cleaning'
+          }
+          
+          // Mostrar notificación de éxito
+          notification.value = {
+            show: true,
+            type: 'success',
+            title: '✅ Operación Exitosa',
+            message: `Factura ${invoiceForm.value.invoice_number} creada y check-out realizado para la habitación ${room.room_number}`
+          }
+          
+          // Cerrar modales
+          showDetailsModal.value = false
+          showInvoiceModal.value = false
+          showCheckoutConfirmModal.value = false
+          
+          // Auto-cerrar notificación después de 5 segundos
+          setTimeout(() => {
+            notification.value.show = false
+          }, 5000)
+          
+          await fetchRooms()
+        } else {
+          notification.value = {
+            show: true,
+            type: 'error',
+            title: 'Error en Check-out',
+            message: checkoutData.error || 'No se pudo completar el check-out'
+          }
+          setTimeout(() => {
+            notification.value.show = false
+          }, 5000)
+        }
+      } catch (error) {
+        console.error('Error:', error)
+        notification.value = {
+          show: true,
+          type: 'error',
+          title: 'Error',
+          message: 'Error en el proceso de checkout y factura'
+        }
+        setTimeout(() => {
+          notification.value.show = false
+        }, 5000)
+      }
+    }
+
+    const cancelCheckout = () => {
+      showCheckoutConfirmModal.value = false
+      checkoutConfirmData.value = { room: null, needsInvoice: null }
     }
 
     const viewRoomDetails = (room) => {
@@ -850,6 +1487,22 @@ export default {
       })
     }
 
+    // Convertir fecha ISO o de cualquier formato a yyyy-MM-dd para inputs type="date"
+    const formatDateForInput = (dateStr) => {
+      if (!dateStr) return ''
+      try {
+        const date = new Date(dateStr)
+        if (isNaN(date.getTime())) return ''
+        // Ajustar por timezone para evitar problemas
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        return `${year}-${month}-${day}`
+      } catch (error) {
+        return ''
+      }
+    }
+
     // Reservation Modal Functions
     const openReservationModal = (room) => {
       reservationForm.value = {
@@ -859,7 +1512,7 @@ export default {
         guestPhone: '',
         checkIn: '',
         checkOut: '',
-        pricePerNight: room.base_price,
+        pricePerNight: room.price_per_night,
         totalAmount: 0,
         nights: 0,
         notes: ''
@@ -896,7 +1549,7 @@ export default {
         
         if (nights > 0) {
           reservationForm.value.nights = nights
-          const pricePerNight = reservationForm.value.pricePerNight || reservationForm.value.room?.base_price || 0
+          const pricePerNight = reservationForm.value.pricePerNight || reservationForm.value.room?.price_per_night || 0
           reservationForm.value.totalAmount = nights * pricePerNight
         } else {
           reservationForm.value.nights = 0
@@ -1006,7 +1659,20 @@ export default {
       closeStatusChangeModal,
       confirmStatusChange,
       performCheckin,
+      confirmCheckin,
+      showCheckinConfirmModal,
+      checkinConfirmData,
       performCheckout,
+      confirmCheckoutWithoutInvoice,
+      openInvoiceModal,
+      saveInvoiceAndCheckout,
+      cancelCheckout,
+      showCheckoutConfirmModal,
+      showInvoiceModal,
+      checkoutConfirmData,
+      invoiceForm,
+      nextInvoiceNumber,
+      notification,
       getTodayDate,
       calculateTotal,
       createReservation,

@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import HandoversHistory from '../../components/vue/HandoversHistory.vue';
+---
+
+<Layout title="Historia de Entregas de Turnos">
+  <div class="min-h-screen bg-gray-50 py-8">
+    <div class="container mx-auto px-6">
+      <HandoversHistory client:load />
+    </div>
+  </div>
+</Layout>

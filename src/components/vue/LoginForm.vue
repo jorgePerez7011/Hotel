@@ -104,15 +104,6 @@
 
         <!-- Navigation Links -->
         <div class="mt-4 text-center space-y-2">
-          <p class="text-sm text-gray-600">
-            ¿Necesitas registrar un nuevo empleado? 
-            <button 
-              @click="goToRegister"
-              class="text-blue-600 hover:text-blue-800 font-medium"
-            >
-              Crear Cuenta
-            </button>
-          </p>
           <button 
             @click="goToHome"
             class="text-sm text-gray-600 hover:text-gray-800 transition-colors"
@@ -236,10 +227,6 @@ const handleLogin = async () => {
 
 const goToHome = () => {
   window.location.href = '/';
-};
-
-const goToRegister = () => {
-  window.location.href = '/register';
 };
 </script>
 

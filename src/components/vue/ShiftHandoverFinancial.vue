@@ -7,7 +7,7 @@
           Entrega de Turnos
         </h3>
         <button 
-          @click="showNewHandoverModal = true"
+          @click="openNewHandoverModal"
           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
         >
           <i class="fas fa-plus mr-2"></i>
@@ -31,25 +31,25 @@
 
       <div v-else class="space-y-4">
         <div 
-          v-for="handover in handovers" 
-          :key="handover.id"
+          v-if="getLatestHandover()"
+          :key="getLatestHandover().id"
           class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
         >
           <!-- Header -->
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center space-x-3">
               <div class="flex items-center">
-                <div class="w-3 h-3 rounded-full mr-2" :class="getStatusColor(handover.status)"></div>
+                <div class="w-3 h-3 rounded-full mr-2" :class="getStatusColor(getLatestHandover().status)"></div>
                 <span class="font-semibold text-gray-800">
-                  {{ handover.outgoing_shift }} → {{ handover.incoming_shift }}
+                  {{ getLatestHandover().outgoing_shift }} → {{ getLatestHandover().incoming_shift }}
                 </span>
               </div>
               <span class="text-sm text-gray-600">
-                {{ formatTime(handover.handover_time) }}
+                {{ formatTime(getLatestHandover().handover_time) }}
               </span>
             </div>
-            <span class="text-xs px-2 py-1 rounded-full" :class="getStatusBadgeClass(handover.status)">
-              {{ getStatusText(handover.status) }}
+            <span class="text-xs px-2 py-1 rounded-full" :class="getStatusBadgeClass(getLatestHandover().status)">
+              {{ getStatusText(getLatestHandover().status) }}
             </span>
           </div>
 
@@ -57,11 +57,11 @@
           <div class="flex items-center justify-between mb-3 text-sm">
             <div>
               <span class="text-gray-600">Entrega:</span>
-              <span class="font-medium ml-1">{{ handover.outgoing_employee_name || 'N/A' }}</span>
+              <span class="font-medium ml-1">{{ getLatestHandover().outgoing_employee_name || 'N/A' }}</span>
             </div>
             <div>
               <span class="text-gray-600">Recibe:</span>
-              <span class="font-medium ml-1">{{ handover.incoming_employee_name || 'N/A' }}</span>
+              <span class="font-medium ml-1">{{ getLatestHandover().incoming_employee_name || 'N/A' }}</span>
             </div>
           </div>
 
@@ -71,34 +71,34 @@
               <div>
                 <span class="block text-gray-600 text-xs">Caja Recibida</span>
                 <span class="font-bold text-green-600">
-                  ${{ Number(handover.cash_received || 0).toFixed(2) }}
-                </span>
-              </div>
-              <div>
-                <span class="block text-gray-600 text-xs">Caja Entregada</span>
-                <span class="font-bold text-blue-600">
-                  ${{ Number(handover.cash_delivered || 0).toFixed(2) }}
+                  {{ new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(getLatestHandover().cash_received || 0) }}
                 </span>
               </div>
               <div>
                 <span class="block text-gray-600 text-xs">Ingresos</span>
                 <span class="font-bold text-green-500">
-                  +${{ Number(handover.total_income || 0).toFixed(2) }}
+                  +{{ new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(getLatestHandover().total_income || 0) }}
                 </span>
               </div>
               <div>
                 <span class="block text-gray-600 text-xs">Egresos</span>
                 <span class="font-bold text-red-500">
-                  -${{ Number(handover.total_expenses || 0).toFixed(2) }}
+                  -{{ new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(getLatestHandover().total_expenses || 0) }}
+                </span>
+              </div>
+              <div>
+                <span class="block text-gray-600 text-xs">Caja Entregada</span>
+                <span class="font-bold text-blue-600">
+                  {{ new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(getLatestHandover().cash_delivered || 0) }}
                 </span>
               </div>
             </div>
             
-            <!-- Cash Difference -->
+            <!-- Total General During Shift -->
             <div class="mt-2 pt-2 border-t border-gray-200 flex justify-between items-center">
-              <span class="text-sm text-gray-600">Diferencia en Caja:</span>
-              <span class="font-bold" :class="handover.cash_difference >= 0 ? 'text-green-600' : 'text-red-600'">
-                ${{ Number(handover.cash_difference || 0).toFixed(2) }}
+              <span class="text-sm text-gray-600 font-medium">Total General en Caja (Turno):</span>
+              <span class="font-bold text-lg text-blue-600">
+                {{ new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(Number(getLatestHandover().cash_received || 0) + Number(getLatestHandover().total_income || 0) - Number(getLatestHandover().total_expenses || 0)) }}
               </span>
             </div>
           </div>
@@ -107,56 +107,64 @@
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3 text-sm">
             <div>
               <span class="block text-gray-600 text-xs">Ocupadas</span>
-              <span class="font-medium">{{ handover.rooms_occupied || 0 }}</span>
+              <span class="font-medium">{{ getLatestHandover().rooms_occupied || 0 }}</span>
             </div>
             <div>
               <span class="block text-gray-600 text-xs">Disponibles</span>
-              <span class="font-medium">{{ handover.rooms_available || 0 }}</span>
+              <span class="font-medium">{{ getLatestHandover().rooms_available || 0 }}</span>
             </div>
             <div>
               <span class="block text-gray-600 text-xs">Check-outs</span>
-              <span class="font-medium">{{ handover.pending_checkouts || 0 }}</span>
+              <span class="font-medium">{{ getLatestHandover().pending_checkouts || 0 }}</span>
             </div>
             <div>
               <span class="block text-gray-600 text-xs">Check-ins</span>
-              <span class="font-medium">{{ handover.pending_checkins || 0 }}</span>
+              <span class="font-medium">{{ getLatestHandover().pending_checkins || 0 }}</span>
             </div>
           </div>
 
           <!-- Notes (Collapsible) -->
-          <div v-if="handover.general_notes || handover.maintenance_issues || handover.financial_notes">
+          <div v-if="getLatestHandover().general_notes || getLatestHandover().maintenance_issues || getLatestHandover().financial_notes">
             <button 
-              @click="toggleNotes(handover.id)"
+              @click="toggleNotes(getLatestHandover().id)"
               class="text-blue-600 text-sm hover:text-blue-800 transition-colors"
             >
-              <i class="fas" :class="expandedNotes[handover.id] ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-              {{ expandedNotes[handover.id] ? 'Ocultar' : 'Ver' }} observaciones
+              <i class="fas" :class="expandedNotes[getLatestHandover().id] ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+              {{ expandedNotes[getLatestHandover().id] ? 'Ocultar' : 'Ver' }} observaciones
             </button>
 
-            <div v-if="expandedNotes[handover.id]" class="mt-2 space-y-2 text-sm">
-              <div v-if="handover.general_notes" class="p-2 bg-blue-50 rounded">
+            <div v-if="expandedNotes[getLatestHandover().id]" class="mt-2 space-y-2 text-sm">
+              <div v-if="getLatestHandover().general_notes" class="p-2 bg-blue-50 rounded">
                 <span class="font-medium text-blue-800">General:</span>
-                <p class="text-blue-700">{{ handover.general_notes }}</p>
+                <p class="text-blue-700">{{ getLatestHandover().general_notes }}</p>
               </div>
-              <div v-if="handover.maintenance_issues" class="p-2 bg-yellow-50 rounded">
+              <div v-if="getLatestHandover().maintenance_issues" class="p-2 bg-yellow-50 rounded">
                 <span class="font-medium text-yellow-800">Mantenimiento:</span>
-                <p class="text-yellow-700">{{ handover.maintenance_issues }}</p>
+                <p class="text-yellow-700">{{ getLatestHandover().maintenance_issues }}</p>
               </div>
-              <div v-if="handover.financial_notes" class="p-2 bg-green-50 rounded">
+              <div v-if="getLatestHandover().financial_notes" class="p-2 bg-green-50 rounded">
                 <span class="font-medium text-green-800">Financiero:</span>
-                <p class="text-green-700">{{ handover.financial_notes }}</p>
+                <p class="text-green-700">{{ getLatestHandover().financial_notes }}</p>
               </div>
             </div>
           </div>
 
           <!-- Transactions Button -->
-          <div class="mt-3 flex justify-end">
+          <div class="mt-4 pt-3 border-t flex gap-2">
             <button
-              @click="viewTransactions(handover)"
-              class="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded hover:bg-gray-200 transition-colors"
+              v-if="getLatestHandover().status === 'pending'"
+              @click="completeHandover(getLatestHandover())"
+              class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm flex-1"
             >
-              <i class="fas fa-list mr-1"></i>
-              Ver Transacciones ({{ (handover.transactions || []).length }})
+              <i class="fas fa-check mr-2"></i>
+              Completar Entrega
+            </button>
+            <button
+              @click="goToHandoverHistory"
+              class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm flex-1"
+            >
+              <i class="fas fa-history mr-2"></i>
+              Ver Historia
             </button>
           </div>
         </div>
@@ -192,20 +200,28 @@
                 </button>
                 <button
                   type="button"
-                  @click="currentTab = 'financial'"
-                  class="py-2 px-1 border-b-2 font-medium text-sm"
-                  :class="currentTab === 'financial' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'"
-                >
-                  Control Financiero
-                </button>
-                <button
-                  type="button"
-                  @click="currentTab = 'operations'"
-                  class="py-2 px-1 border-b-2 font-medium text-sm"
-                  :class="currentTab === 'operations' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'"
-                >
-                  Observaciones
-                </button>
+                    @click="currentTab = 'rooms'"
+                    class="py-2 px-1 border-b-2 font-medium text-sm"
+                    :class="currentTab === 'rooms' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'"
+                  >
+                    Estado de Habitaciones
+                  </button>
+                  <button
+                    type="button"
+                    @click="currentTab = 'financial'"
+                    class="py-2 px-1 border-b-2 font-medium text-sm"
+                    :class="currentTab === 'financial' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'"
+                  >
+                    Control Financiero
+                  </button>
+                  <button
+                    type="button"
+                    @click="currentTab = 'notes'"
+                    class="py-2 px-1 border-b-2 font-medium text-sm"
+                    :class="currentTab === 'notes' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500'"
+                  >
+                    Observaciones
+                  </button>
               </nav>
             </div>
           </div>
@@ -262,16 +278,8 @@
               </div>
             </div>
 
-            <!-- Room Status -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Habitaciones Ocupadas</label>
-                <input v-model.number="newHandover.rooms_occupied" type="number" min="0" max="20" class="w-full border border-gray-300 rounded-md px-3 py-2">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Habitaciones Disponibles</label>
-                <input v-model.number="newHandover.rooms_available" type="number" min="0" max="20" class="w-full border border-gray-300 rounded-md px-3 py-2">
-              </div>
+            <!-- Check-ins and Check-outs -->
+            <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Check-outs Pendientes</label>
                 <input v-model.number="newHandover.pending_checkouts" type="number" min="0" class="w-full border border-gray-300 rounded-md px-3 py-2">
@@ -279,6 +287,70 @@
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Check-ins Pendientes</label>
                 <input v-model.number="newHandover.pending_checkins" type="number" min="0" class="w-full border border-gray-300 rounded-md px-3 py-2">
+              </div>
+            </div>
+          </div>
+
+          <!-- Room Selection Tab -->
+          <div v-if="currentTab === 'rooms'" class="space-y-4">
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h4 class="font-medium text-gray-900 mb-4">Selección de Habitaciones Ocupadas</h4>
+              <p class="text-sm text-gray-600 mb-4">Haz clic en las habitaciones que están ocupadas en este momento:</p>
+
+              <!-- Floor 1 Rooms (101-109) -->
+              <div class="mb-6">
+                <h5 class="text-sm font-medium text-gray-700 mb-2">Piso 1 (Habitaciones 101-109)</h5>
+                <div class="grid grid-cols-3 md:grid-cols-9 gap-2">
+                  <button
+                    v-for="room in floor1Rooms"
+                    :key="room"
+                    type="button"
+                    @click="toggleRoom(room)"
+                    :class="[
+                      'p-2 text-xs font-medium rounded border transition-colors',
+                      selectedRooms.includes(room)
+                        ? 'bg-red-500 text-white border-red-500'
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                    ]"
+                  >
+                    {{ room }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- Floor 2 Rooms (201-211) -->
+              <div class="mb-4">
+                <h5 class="text-sm font-medium text-gray-700 mb-2">Piso 2 (Habitaciones 201-211)</h5>
+                <div class="grid grid-cols-3 md:grid-cols-9 gap-2">
+                  <button
+                    v-for="room in floor2Rooms"
+                    :key="room"
+                    type="button"
+                    @click="toggleRoom(room)"
+                    :class="[
+                      'p-2 text-xs font-medium rounded border transition-colors',
+                      selectedRooms.includes(room)
+                        ? 'bg-red-500 text-white border-red-500'
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                    ]"
+                  >
+                    {{ room }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- Summary -->
+              <div class="mt-4 p-3 bg-blue-50 rounded-lg">
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span class="font-medium text-blue-800">Habitaciones Ocupadas:</span>
+                    <span class="ml-2 text-blue-600">{{ selectedRooms.length }}</span>
+                  </div>
+                  <div>
+                    <span class="font-medium text-blue-800">Habitaciones Disponibles:</span>
+                    <span class="ml-2 text-blue-600">{{ totalRooms - selectedRooms.length }}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -464,8 +536,8 @@
             </div>
           </div>
 
-          <!-- Operations Tab -->
-          <div v-if="currentTab === 'operations'" class="space-y-4">
+          <!-- Observaciones Tab -->
+          <div v-if="currentTab === 'notes'" class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">
                 Observaciones Generales
@@ -625,7 +697,7 @@
 </template>
 
 <script>
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, watch } from 'vue'
 
 export default {
   name: 'ShiftHandover',
@@ -638,6 +710,12 @@ export default {
     const selectedHandover = ref(null)
     const expandedNotes = ref({})
     const currentTab = ref('basic')
+    const selectedRooms = ref([])
+
+    // Room configuration
+    const floor1Rooms = [101, 102, 103, 104, 105, 106, 107, 108, 109]
+    const floor2Rooms = [201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211]
+    const totalRooms = floor1Rooms.length + floor2Rooms.length
 
     const newHandover = reactive({
       outgoing_employee_id: '',
@@ -715,13 +793,71 @@ export default {
         .reduce((sum, t) => sum + (Number(t.amount) || 0), 0)
     }
 
+    const toggleRoom = (roomNumber) => {
+      const index = selectedRooms.value.indexOf(roomNumber)
+      if (index > -1) {
+        selectedRooms.value.splice(index, 1)
+      } else {
+        selectedRooms.value.push(roomNumber)
+      }
+    }
+
+    // Watch for changes in selectedRooms to update calculated fields
+    watch(selectedRooms, (newSelectedRooms) => {
+      newHandover.rooms_occupied = newSelectedRooms.length
+      newHandover.rooms_available = totalRooms - newSelectedRooms.length
+    }, { immediate: true })
+
     const createHandover = async () => {
+      // Validar campos requeridos
+      if (!newHandover.outgoing_employee_id || newHandover.outgoing_employee_id === '') {
+        alert('Por favor selecciona el empleado que entrega el turno')
+        return
+      }
+
+      if (!newHandover.incoming_employee_id || newHandover.incoming_employee_id === '') {
+        alert('Por favor selecciona el empleado que recibe el turno')
+        return
+      }
+
+      if (!newHandover.outgoing_shift || newHandover.outgoing_shift === '') {
+        alert('Por favor selecciona el turno de salida')
+        return
+      }
+
+      if (!newHandover.incoming_shift || newHandover.incoming_shift === '') {
+        alert('Por favor selecciona el turno de entrada')
+        return
+      }
+
+      if (!newHandover.shift_date) {
+        alert('Por favor selecciona la fecha de la entrega')
+        return
+      }
+
       loading.value = true
       try {
         const handoverData = {
-          ...newHandover,
+          outgoing_employee_id: newHandover.outgoing_employee_id,
+          incoming_employee_id: newHandover.incoming_employee_id,
+          shift_date: newHandover.shift_date,
+          outgoing_shift: newHandover.outgoing_shift,
+          incoming_shift: newHandover.incoming_shift,
+          rooms_occupied: newHandover.rooms_occupied,
+          rooms_available: newHandover.rooms_available,
+          pending_checkouts: newHandover.pending_checkouts,
+          pending_checkins: newHandover.pending_checkins,
+          selected_rooms: selectedRooms.value,
+          general_notes: newHandover.general_notes,
+          maintenance_issues: newHandover.maintenance_issues,
+          guest_requests: newHandover.guest_requests,
+          inventory_notes: newHandover.inventory_notes,
+          cash_received: newHandover.cash_received,
+          cash_delivered: newHandover.cash_delivered,
           total_income: calculateTotalIncome(),
           total_expenses: calculateTotalExpenses(),
+          financial_notes: newHandover.financial_notes,
+          transactions: newHandover.transactions,
           outgoing_signature: 'Firmado digitalmente'
         }
 
@@ -739,13 +875,51 @@ export default {
           alert('Entrega de turno creada exitosamente')
         } else {
           const error = await response.json()
-          alert('Error: ' + error.message)
+          alert('Error: ' + error.error || error.message)
         }
       } catch (error) {
         console.error('Error creating handover:', error)
         alert('Error al crear la entrega de turno')
       } finally {
         loading.value = false
+      }
+    }
+
+    const openNewHandoverModal = async () => {
+      showNewHandoverModal.value = true
+      
+      // Cargar la última entrega para obtener las habitaciones ocupadas
+      try {
+        const today = new Date().toISOString().split('T')[0]
+        const response = await fetch(`http://localhost:4000/api/handovers/date/${today}`)
+        const data = await response.json()
+        
+        if (data.handovers && data.handovers.length > 0) {
+          // Obtener la última entrega (la más reciente)
+          const lastHandover = data.handovers[data.handovers.length - 1]
+          
+          // Cargar las habitaciones ocupadas de la última entrega
+          if (lastHandover.selected_rooms) {
+            let occupiedRooms = []
+            
+            if (typeof lastHandover.selected_rooms === 'string') {
+              try {
+                occupiedRooms = JSON.parse(lastHandover.selected_rooms)
+              } catch (e) {
+                console.error('Error parsing selected_rooms:', e)
+              }
+            } else if (Array.isArray(lastHandover.selected_rooms)) {
+              occupiedRooms = lastHandover.selected_rooms
+            }
+            
+            // Pre-seleccionar las habitaciones ocupadas
+            selectedRooms.value = occupiedRooms
+            console.log('Habitaciones cargadas:', occupiedRooms)
+            // El watcher actualizará automáticamente rooms_occupied y rooms_available
+          }
+        }
+      } catch (error) {
+        console.error('Error loading last handover:', error)
       }
     }
 
@@ -771,11 +945,63 @@ export default {
         financial_notes: '',
         transactions: []
       })
+      selectedRooms.value = []
     }
 
     const viewTransactions = (handover) => {
       selectedHandover.value = handover
       showTransactionsModal.value = true
+    }
+
+    const downloadPDF = async (id) => {
+      try {
+        const response = await fetch(`http://localhost:4000/api/handovers/${id}/pdf`)
+        
+        if (response.ok) {
+          const blob = await response.blob()
+          const url = window.URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `entrega-turno-${id}.pdf`
+          document.body.appendChild(a)
+          a.click()
+          window.URL.revokeObjectURL(url)
+          document.body.removeChild(a)
+        } else {
+          console.error('Error downloading PDF')
+          alert('Error al descargar el PDF')
+        }
+      } catch (error) {
+        console.error('Error downloading PDF:', error)
+        alert('Error de conexión al descargar el PDF')
+      }
+    }
+
+    const completeHandover = async (handover) => {
+      try {
+        const response = await fetch(`http://localhost:4000/api/handovers/${handover.id}/complete`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ incoming_signature: 'signed' })
+        })
+
+        if (response.ok) {
+          await fetchHandovers()
+          alert('Entrega completada exitosamente')
+        } else {
+          const error = await response.json()
+          alert(`Error: ${error.error}`)
+        }
+      } catch (error) {
+        console.error('Error completing handover:', error)
+        alert('Error al completar la entrega')
+      }
+    }
+
+    const goToHandoverHistory = () => {
+      window.location.href = '/admin/handovers-history'
     }
 
     const toggleNotes = (handoverId) => {
@@ -834,6 +1060,10 @@ export default {
         .reduce((sum, t) => sum + Number(t.amount), 0)
     }
 
+    const getLatestHandover = () => {
+      return handovers.value.length > 0 ? handovers.value[0] : null
+    }
+
     onMounted(() => {
       fetchHandovers()
       fetchEmployees()
@@ -848,21 +1078,31 @@ export default {
       selectedHandover,
       expandedNotes,
       currentTab,
+      selectedRooms,
+      floor1Rooms,
+      floor2Rooms,
+      totalRooms,
       newHandover,
       addTransaction,
       removeTransaction,
       calculateTotalIncome,
       calculateTotalExpenses,
+      toggleRoom,
       createHandover,
+      openNewHandoverModal,
       closeModal,
       viewTransactions,
+      downloadPDF,
+      completeHandover,
+      goToHandoverHistory,
       toggleNotes,
       getStatusColor,
       getStatusBadgeClass,
       getStatusText,
       formatTime,
       formatDateTime,
-      getTransactionSum
+      getTransactionSum,
+      getLatestHandover
     }
   }
 }

@@ -11,6 +11,9 @@ import hotelRoutes from './routes/hotel.js';
 import bookingRoutes from './routes/bookings.js';
 import employeeRoutes from './routes/employees.js';
 import handoverRoutes from './routes/handovers.js';
+import reportsRoutes from './routes/reports.js';
+import companiesRoutes from './routes/companies.js';
+import invoicesRoutes from './routes/invoices.js';
 
 // Import database connections
 import { connectMySQL } from './config/mysql.js';
@@ -69,6 +72,9 @@ app.use('/api/hotel', hotelRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/handovers', handoverRoutes);
+app.use('/api/reports', reportsRoutes);
+app.use('/api/companies', companiesRoutes);
+app.use('/api/invoices', invoicesRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
@@ -103,12 +109,14 @@ const initializeDatabase = async () => {
     
     // MongoDB is optional
     if (process.env.MONGODB_URI) {
-      try {
-        await connectMongoDB();
+      const mongoSuccess = await connectMongoDB();
+      if (mongoSuccess) {
         console.log('✅ MongoDB connected successfully');
-      } catch (mongoError) {
+      } else {
         console.log('⚠️  MongoDB connection failed, continuing with MySQL only');
       }
+    } else {
+      console.log('ℹ️  MongoDB URI not configured, using MySQL only');
     }
   } catch (error) {
     console.log('⚠️  Database connections failed, running in demo mode');

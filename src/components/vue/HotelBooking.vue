@@ -10,20 +10,20 @@
             <span class="text-sm italic text-gray-600">Follow Us:</span>
             <div class="flex space-x-2">
               <a href="#" class="text-gray-600 hover:text-primary-600"><i class="fab fa-instagram"></i></a>
-              <a href="#" class="text-gray-600 hover:text-primary-600"><i class="fab fa-facebook"></i></a>
-              <a href="#" class="text-gray-600 hover:text-primary-600"><i class="fab fa-twitter"></i></a>
+              <a href="https://www.facebook.com/solhotel1/?locale=es_LA" target="_blank" class="text-gray-600 hover:text-primary-600"><i class="fab fa-facebook"></i></a>
             </div>
           </div>
           
           <!-- Logo -->
-          <div class="text-center">
+          <div class="text-center flex items-center justify-center space-x-3">
+            <img src="/Fotos/Logo.png" alt="Hotel Sol Logo" class="h-10 w-auto rounded-full" />
             <h1 class="text-2xl font-bold text-gray-800">HOTEL SOL</h1>
           </div>
           
           <!-- Contact Info -->
           <div class="flex items-center space-x-2">
             <i class="fas fa-phone text-primary-600"></i>
-            <a href="tel:+573001234567" class="text-gray-600 hover:text-primary-600">+57 (300) 123-4567</a>
+            <a href="tel:+573001234567" class="text-gray-600 hover:text-primary-600">+57 317 6388290 - 323 3928158</a>
           </div>
         </div>
       </div>
@@ -35,7 +35,7 @@
             <li><a href="/" class="text-primary-600 font-semibold border-b-2 border-primary-600 pb-1">Inicio</a></li>
             <li><a href="/about" class="text-gray-700 hover:text-primary-600 transition-colors">Nosotros</a></li>
             <li><a href="/rooms" class="text-gray-700 hover:text-primary-600 transition-colors">Habitaciones</a></li>
-            <li><a href="/contact" class="text-gray-700 hover:text-primary-600 transition-colors">Contacto</a></li>
+            <li><a href="/services" class="text-gray-700 hover:text-primary-600 transition-colors">Servicios</a></li>
             <li><a href="/admin/dashboard" class="text-gray-700 hover:text-primary-600 transition-colors">Panel Admin</a></li>
           </ul>
         </div>
@@ -47,8 +47,24 @@
       <div class="grid lg:grid-cols-3 xl:grid-cols-4 min-h-screen">
         <!-- Slider Section (Left) -->
         <div class="lg:col-span-2 xl:col-span-3 relative bg-gray-500 overflow-hidden">
+          <!-- Background Images -->
+          <div class="absolute inset-0">
+            <img 
+              v-for="(image, index) in slideImages"
+              :key="index"
+              :src="image"
+              :alt="`Slide ${index + 1}`"
+              :class="[
+                'absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out',
+                index === currentSlideIndex ? 'opacity-100' : 'opacity-0'
+              ]"
+            />
+            <!-- Overlay oscuro para mejor legibilidad del texto -->
+            <div class="absolute inset-0 bg-black/40"></div>
+          </div>
+          
           <!-- Slide Content -->
-          <div class="absolute inset-0 flex items-center justify-center text-white text-center">
+          <div class="absolute inset-0 flex items-center justify-center text-white text-center z-10">
             <div class="max-w-4xl px-8">
               <h1 class="text-6xl md:text-8xl font-bold mb-6 animate-fade-in">
                 {{ currentSlide.title }}
@@ -58,14 +74,30 @@
                 <h4 class="text-2xl mb-2">{{ currentSlide.subtitle1 }}</h4>
                 <h3 class="text-3xl mb-8">{{ currentSlide.subtitle2 }}</h3>
               </div>
-              <button class="border-2 border-white text-white px-8 py-3 text-lg font-medium hover:bg-white hover:text-gray-800 transition-all duration-300">
+              <button 
+                @click="navigateToAbout"
+                class="border-2 border-white text-white px-8 py-3 text-lg font-medium hover:bg-white hover:text-gray-800 transition-all duration-300">
                 conoce más
               </button>
             </div>
           </div>
           
+          <!-- Controles del slider -->
+          <button
+            @click="prevSlide"
+            class="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/50 text-white p-3 rounded-full transition-colors duration-300"
+          >
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button
+            @click="nextSlide"
+            class="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/50 text-white p-3 rounded-full transition-colors duration-300"
+          >
+            <i class="fas fa-chevron-right"></i>
+          </button>
+          
           <!-- Slide Indicators -->
-          <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
             <button 
               v-for="(slide, index) in slides" 
               :key="index"
@@ -73,12 +105,6 @@
               :class="['w-3 h-3 rounded-full transition-colors', 
                       currentSlideIndex === index ? 'bg-white' : 'bg-white/50']"
             ></button>
-          </div>
-          
-          <!-- Background placeholder -->
-          <div class="absolute inset-0 bg-gradient-to-br from-gray-600 to-gray-800"></div>
-          <div class="absolute inset-0 flex items-center justify-center opacity-10">
-            <span class="text-gray-300 text-4xl">Slide {{ currentSlideIndex + 1 }} Background Image</span>
           </div>
         </div>
 
@@ -118,7 +144,7 @@
                 <input 
                   v-model="bookingForm.phone"
                   type="tel" 
-                  placeholder="+57 (300) 123-4567"
+                  placeholder="+57 317 6388290 - 323 3928158"
                   class="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   required
                 />
@@ -210,15 +236,17 @@
     <section class="py-16 bg-white">
       <div class="container mx-auto px-6">
         <div class="grid lg:grid-cols-2 gap-12 items-center">
+
           <!-- Video/Image Section -->
           <div class="relative">
-            <div class="bg-gray-400 aspect-video rounded-lg flex items-center justify-center">
-              <div class="text-center text-white">
-                <i class="fas fa-play-circle text-6xl mb-4 opacity-70"></i>
-                <p class="text-lg">Video Background Image<br>1020x525</p>
-              </div>
-            </div>
-          </div>
+      <div class="bg-gray-400 aspect-video rounded-lg overflow-hidden">
+    <img
+      src="Fotos\FrenteHotel.jpg"
+      alt="Video background"
+      class="w-full h-96 object-cover"
+    >
+      </div>
+      </div>
           
           <!-- Content Section -->
           <div class="bg-primary-600 text-white p-8 rounded-lg">
@@ -248,8 +276,8 @@
                 <p class="font-semibold">Servicio Premium</p>
               </div>
               <div class="bg-white/10 p-4 rounded-lg text-center">
-                <div class="text-2xl mb-2">🏊</div>
-                <p class="font-semibold">Piscina & Spa</p>
+                <div class="text-2xl mb-2">☂️</div>
+                <p class="font-semibold">Sala Comun</p>
               </div>
               <div class="bg-white/10 p-4 rounded-lg text-center">
                 <div class="text-2xl mb-2">🕐</div>
@@ -275,22 +303,21 @@
           <div>
             <h3 class="text-4xl font-bold mb-6 text-gray-900">Sala comun Interior del Hotel</h3>
             <p class="text-gray-700 mb-6">
-              La Sala interior climatizada tiene carpas y sillas para compartir en familia. El jacuzzi cuenta con ventanales que dan al estanque y al lado norte del lugar de belleza local. Por razones de seguridad y salud, los niños deben estar acompañados por un adulto al visitar la piscina.
+              Este es nuestro rincón común de arte y conversación, donde los colores del mural le ponen onda creativa a cada pausa del día. Aquí puedes sentarte bajo las sombrillas, tomar un café y dejar que las ideas fluyan mientras compartes con otras personas en un ambiente relajado pero con estilo.
             </p>
             <p class="text-gray-700 mb-8">
-              La serena sala  del Hotel Sol cuenta con una decoración elegante que presenta impresionantes columnas de teca del piso al techo sobre un fresco piso de baldosas negras. También está disponible la cena junto a la piscina, con una selección de platos de cualquier cocina que desee, saludables y deliciosos.
+              Pensado para ejecutivos, emprendedores y equipos, este espacio ofrece mesas cómodas, buena iluminación y un ambiente moderno que invita tanto a reuniones informales como a trabajar con foco. Es el lugar ideal para despejar la mente entre reuniones, cerrar acuerdos con calma o simplemente recargar energía sin salir del entorno profesional.
             </p>
             
           </div>
           
-          <div class="relative">
-            <div class="bg-gray-400 aspect-square rounded-lg flex items-center justify-center">
-              <div class="text-center text-white">
-                <i class="fas fa-swimming-pool text-6xl mb-4 opacity-70"></i>
-                <p class="text-lg">Pool Image<br>546x516</p>
-              </div>
-            </div>
-          </div>
+          <div class=" h-[600px] overflow-hidden rounded-xl">
+      <img 
+    src="Fotos\SalaComun.jpg" 
+    alt="Descripcion de la imagen"
+    class="w-full h-full object-cover"
+          >
+      </div>
         </div>
       </div>
     </section>
@@ -306,48 +333,90 @@
         <hr class="mb-12 border-gray-300">
         
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          <div v-for="n in 6" :key="n" class="relative group cursor-pointer">
-            <div :class="['bg-gray-400 rounded-lg flex items-center justify-center text-white transition-transform group-hover:scale-105',
-                        n % 2 === 0 ? 'aspect-[3/2]' : 'aspect-[3/4]']">
-              <div class="text-center">
-                <i class="fas fa-image text-4xl mb-2 opacity-70"></i>
-                <p>Gallery {{ n }}</p>
+          <div 
+            v-for="image in displayedImages" 
+            :key="image.id" 
+            class="relative group cursor-pointer overflow-hidden rounded-lg"
+            @click="openImageModal(image)"
+          >
+            <div class="aspect-[3/2] md:aspect-[4/3] overflow-hidden">
+              <img 
+                :src="image.src" 
+                :alt="image.alt"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                loading="lazy"
+              />
+            </div>
+            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+              <div class="text-white text-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                <i class="fas fa-search-plus text-3xl mb-2"></i>
+                <p class="text-sm font-medium">{{ image.name }}</p>
               </div>
             </div>
-            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-              <div class="text-white text-center">
-                <i class="fas fa-thumbs-up text-2xl mb-2"></i>
-                <p>346 likes</p>
-              </div>
-            </div>
+            <!-- Overlay gradient for better text readability -->
+            <div class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>
+        </div>
+        
+        <!-- Show More/Less Button -->
+        <div class="text-center mt-8">
+          <button 
+            @click="toggleShowAllImages"
+            class="bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-300 flex items-center justify-center mx-auto"
+          >
+            <i :class="showAllImages ? 'fas fa-chevron-up mr-2' : 'fas fa-chevron-down mr-2'"></i>
+            {{ showAllImages ? 'Mostrar Menos' : `Ver Más Fotos (${galleryImages.length - initialDisplayCount})` }}
+          </button>
         </div>
       </div>
     </section>
 
-    <!-- Blog Section -->
-    <section class="py-16 bg-gray-50">
-      <div class="container mx-auto px-6">
-        <h3 class="text-4xl font-bold text-gray-900 mb-8">Nuestro Blog</h3>
-        <hr class="mb-12 border-gray-300">
+    <!-- Image Modal -->
+    <div v-if="showImageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" @click="closeImageModal">
+      <div class="relative max-w-4xl max-h-full p-4" @click.stop>
+        <!-- Close button -->
+        <button 
+          @click="closeImageModal"
+          class="absolute top-2 right-2 text-white bg-black bg-opacity-50 hover:bg-opacity-75 rounded-full w-10 h-10 flex items-center justify-center z-10"
+        >
+          <i class="fas fa-times text-xl"></i>
+        </button>
         
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div v-for="post in blogPosts" :key="post.id" class="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div class="bg-gray-400 h-48 flex items-center justify-center">
-              <div class="text-center text-white">
-                <i class="fas fa-newspaper text-4xl mb-2 opacity-70"></i>
-                <p>Blog Image<br>460x369</p>
-              </div>
-            </div>
-            <div class="p-6">
-              <h5 class="text-xl font-bold mb-4 text-gray-900">{{ post.title }}</h5>
-              <div class="flex justify-between text-sm text-gray-600">
-                <span><i class="fas fa-calendar mr-2"></i>{{ post.date }}</span>
-                <span><i class="fas fa-thumbs-up mr-2"></i>{{ post.likes }}</span>
-              </div>
-            </div>
+        <!-- Previous button -->
+        <button 
+          @click="prevImage"
+          class="absolute left-2 top-1/2 transform -translate-y-1/2 text-white bg-black bg-opacity-50 hover:bg-opacity-75 rounded-full w-12 h-12 flex items-center justify-center z-10"
+        >
+          <i class="fas fa-chevron-left text-xl"></i>
+        </button>
+        
+        <!-- Next button -->
+        <button 
+          @click="nextImage"
+          class="absolute right-2 top-1/2 transform -translate-y-1/2 text-white bg-black bg-opacity-50 hover:bg-opacity-75 rounded-full w-12 h-12 flex items-center justify-center z-10"
+        >
+          <i class="fas fa-chevron-right text-xl"></i>
+        </button>
+        
+        <img 
+          v-if="selectedImage"
+          :src="selectedImage.src" 
+          :alt="selectedImage.alt"
+          class="max-w-full max-h-full object-contain rounded-lg"
+        />
+        <div v-if="selectedImage" class="mt-4 text-white text-center">
+          <div class="mb-2 text-sm opacity-75">
+            {{ galleryImages.findIndex(img => img.id === selectedImage.id) + 1 }} de {{ galleryImages.length }}
           </div>
+          <h3 class="text-xl font-semibold mb-2">{{ selectedImage.name }}</h3>
         </div>
+      </div>
+    </div>
+
+    <!-- Hotel Map Section -->
+    <section class="py-16 bg-white">
+      <div class="container mx-auto px-6">
+        <HotelMap />
       </div>
     </section>
 
@@ -379,15 +448,15 @@
             <div class="space-y-4">
               <div class="flex items-start space-x-3">
                 <i class="fas fa-map-marker-alt text-primary-500 mt-1"></i>
-                <span class="text-gray-300">Calle 123 #45-67, Centro, Bogotá, Colombia</span>
+                <span class="text-gray-300">Cl. 19 #8-56, San Martín, Cesar</span>
               </div>
               <div class="flex items-center space-x-3">
                 <i class="fas fa-phone text-primary-500"></i>
-                <a href="tel:+573001234567" class="text-gray-300 hover:text-white">+57 (300) 123-4567</a>
+                <a href="tel:+573001234567" class="text-gray-300 hover:text-white">+57 317 6388290 - 323 3928158</a>
               </div>
               <div class="flex items-center space-x-3">
                 <i class="fas fa-envelope text-primary-500"></i>
-                <a href="mailto:kokocardenas7011@gmail.com" class="text-gray-300 hover:text-white">kokocardenas7011@gmail.com</a>
+                <a href="mailto:Solhotel.recepcion@gmail.com" class="text-gray-300 hover:text-white">Solhotel.recepcion@gmail.com</a>
               </div>
             </div>
           </div>
@@ -414,6 +483,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
+import HotelMap from './HotelMap.vue';
 
 interface Slide {
   id: number;
@@ -446,6 +516,25 @@ const message = ref('');
 const messageType = ref<'success' | 'error'>('success');
 const currentSlideIndex = ref(0);
 
+// Imágenes del carrusel
+const slideImages = ref([
+  '/Fotos/SlidePrincipal/DSC09271.jpg',
+  '/Fotos/Gym.jpg',
+  '/Fotos/SlidePrincipal/DSC09409.jpg',
+  '/Fotos/SlidePrincipal/DSC09254.jpg',
+  '/Fotos/SlidePrincipal/DSC09306.jpg',
+  '/Fotos/SlidePrincipal/5042186267596098371.jpg',
+  '/Fotos/SlidePrincipal/5042186267596098450.jpg'
+]);
+
+// Modal state for gallery
+const showImageModal = ref(false);
+const selectedImage = ref(null);
+
+// Gallery display state
+const showAllImages = ref(false);
+const initialDisplayCount = 6;
+
 // Slider data
 const slides = ref<Slide[]>([
   {
@@ -465,30 +554,67 @@ const slides = ref<Slide[]>([
     title: 'Revitalízate y Relájate',
     subtitle1: 'Déjate llevar por nuestro',
     subtitle2: 'resort spa de primera clase'
+  },
+  {
+    id: 4,
+    title: 'Experiencia Única',
+    subtitle1: 'Vive momentos inolvidables',
+    subtitle2: 'en nuestro hotel'
+  },
+  {
+    id: 5,
+    title: 'Comodidad Total',
+    subtitle1: 'Diseño moderno y elegante',
+    subtitle2: 'para tu descanso perfecto'
+  },
+  {
+    id: 6,
+    title: 'Lujo y Confort',
+    subtitle1: 'Disfrutá de las mejores amenidades',
+    subtitle2: 'del hotel'
+  },
+  {
+    id: 7,
+    title: 'Bienvenido al Paraíso',
+    subtitle1: 'Donde cada detalle cuenta',
+    subtitle2: 'para tu satisfacción'
   }
 ]);
 
-// Blog posts data
-const blogPosts = ref<BlogPost[]>([
-  {
-    id: 1,
-    title: 'Las 3 Principales Razones por las que Hotel Sol Ofrece los Mejores Tratamientos de Spa',
-    date: '12 de octubre, 2025',
-    likes: 78
-  },
-  {
-    id: 2,
-    title: 'Terapias y Actividades Destacadas en el Resort Spa Hotel Sol',
-    date: '26 de octubre, 2025',
-    likes: 15
-  },
-  {
-    id: 3,
-    title: 'Por qué tu Escapada Relajante Comienza Aquí',
-    date: '23 de agosto, 2025',
-    likes: 40
-  }
+// Gallery images data
+const galleryImages = ref([
+  { id: 1, src: '/Fotos/Galeria/DSC09231.jpg', alt: 'Vista del hotel', name: 'Pasillo Principal' },
+  { id: 2, src: '/Fotos/Galeria/DSC09236.jpg', alt: 'Habitación premium', name: 'Recepcion' },
+  { id: 3, src: '/Fotos/FrenteHotel.jpg', alt: 'Sala de estar', name: 'Entrada Hotel' },
+  { id: 4, src: '/Fotos/Galeria/GranArte.jpg', alt: 'Piscina exterior', name: 'Arte La Ultima Cena' },
+  { id: 5, src: '/Fotos/Galeria/DSC09257.jpg', alt: 'Restaurante', name: 'Recepcion' },
+  { id: 6, src: '/Fotos/Galeria/DSC09289-Mejorado-NR.jpg', alt: 'Gimnasio', name: 'Entrada Habitacion' },
+  { id: 7, src: '/Fotos/Galeria/DSC09300.jpg', alt: 'Spa y bienestar', name: 'Arte' },
+  { id: 8, src: '/Fotos/Galeria/DSC09316.jpg', alt: 'Terraza panorámica', name: 'Ultima Cena' },
+  { id: 9, src: '/Fotos/Galeria/DSC09319.jpg', alt: 'Lobby principal', name: 'Arte de la Sala Comun' },
+  
+  { id: 11, src: '/Fotos/Galeria/DSC09335.jpg', alt: 'Jardín interior', name: 'Habitacion' },
+  { id: 12, src: '/Fotos/Galeria/DSC09338.jpg', alt: 'Bar del hotel', name: ' Habitacion 2' },
+  { id: 13, src: '/Fotos/Galeria/DSC09349.jpg', alt: 'Área de juegos', name: 'Pasillo 1' },
+  { id: 14, src: '/Fotos/Galeria/DSC09352.jpg', alt: 'Sala de conferencias', name: 'Pasillo 2' },
+  { id: 15, src: '/Fotos/Galeria/DSC09366.jpg', alt: 'Vista nocturna', name: 'Arte' },
+  { id: 16, src: '/Fotos/Galeria/DSC09372.jpg', alt: 'Desayuno buffet', name: 'Un poco mas de lo que nos caracteriza Arte' }
 ]);
+
+// Computed property for displayed images
+const displayedImages = computed(() => {
+  return showAllImages.value ? galleryImages.value : galleryImages.value.slice(0, initialDisplayCount);
+});
+
+// Function to toggle show all images
+const toggleShowAllImages = () => {
+  showAllImages.value = !showAllImages.value;
+};
+
+// Navegación
+const navigateToAbout = () => {
+  window.location.href = '/about';
+};
 
 // Computed properties
 const messageClass = computed(() => {
@@ -579,6 +705,68 @@ const submitBooking = async () => {
   }
 };
 
+// Function to open image modal
+const openImageModal = (image) => {
+  selectedImage.value = image;
+  showImageModal.value = true;
+};
+
+// Function to close image modal
+const closeImageModal = () => {
+  showImageModal.value = false;
+  selectedImage.value = null;
+};
+
+// Function to navigate to previous image
+const prevImage = () => {
+  const currentIndex = galleryImages.value.findIndex(img => img.id === selectedImage.value.id);
+  const prevIndex = currentIndex > 0 ? currentIndex - 1 : galleryImages.value.length - 1;
+  selectedImage.value = galleryImages.value[prevIndex];
+};
+
+// Function to navigate to next image
+const nextImage = () => {
+  const currentIndex = galleryImages.value.findIndex(img => img.id === selectedImage.value.id);
+  const nextIndex = currentIndex < galleryImages.value.length - 1 ? currentIndex + 1 : 0;
+  selectedImage.value = galleryImages.value[nextIndex];
+};
+
+// Function to handle keyboard navigation
+const handleKeydown = (event) => {
+  if (!showImageModal.value) return;
+  
+  switch (event.key) {
+    case 'ArrowLeft':
+      event.preventDefault();
+      prevImage();
+      break;
+    case 'ArrowRight':
+      event.preventDefault();
+      nextImage();
+      break;
+    case 'Escape':
+      event.preventDefault();
+      closeImageModal();
+      break;
+  }
+};
+
+// Funciones del carrusel de imágenes
+const nextSlide = () => {
+  currentSlideIndex.value = (currentSlideIndex.value + 1) % slides.value.length;
+  resetAutoplay();
+};
+
+const prevSlide = () => {
+  currentSlideIndex.value = (currentSlideIndex.value - 1 + slides.value.length) % slides.value.length;
+  resetAutoplay();
+};
+
+const resetAutoplay = () => {
+  stopSlideshow();
+  startSlideshow();
+};
+
 // Lifecycle hooks
 onMounted(() => {
   // Set minimum dates (today)
@@ -592,10 +780,14 @@ onMounted(() => {
   
   // Start slideshow
   startSlideshow();
+  
+  // Add keyboard event listener
+  document.addEventListener('keydown', handleKeydown);
 });
 
 onUnmounted(() => {
   stopSlideshow();
+  document.removeEventListener('keydown', handleKeydown);
 });
 </script>
 

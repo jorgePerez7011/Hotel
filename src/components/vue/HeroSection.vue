@@ -1,6 +1,53 @@
 <template>
-  <section class="bg-gradient-to-br from-primary-900 to-primary-700 text-white min-h-screen flex items-center">
-    <div class="container mx-auto px-6 py-20">
+  <section class="relative text-white min-h-screen flex items-center overflow-hidden">
+    <!-- Slider de imágenes -->
+    <div class="absolute inset-0 w-full h-full">
+      <div class="relative w-full h-full">
+        <!-- Imágenes del slide -->
+        <img 
+          v-for="(image, index) in slides" 
+          :key="index"
+          :src="image"
+          :alt="`Slide ${index + 1}`"
+          :class="[
+            'absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out',
+            index === currentSlide ? 'opacity-100' : 'opacity-0'
+          ]"
+        />
+        <!-- Overlay oscuro para mejor legibilidad del texto -->
+        <div class="absolute inset-0 bg-black/40"></div>
+      </div>
+      
+      <!-- Controles del slider -->
+      <button
+        @click="prevSlide"
+        class="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/30 hover:bg-white/50 text-white p-3 rounded-full transition-colors duration-300"
+      >
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button
+        @click="nextSlide"
+        class="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/30 hover:bg-white/50 text-white p-3 rounded-full transition-colors duration-300"
+      >
+        <i class="fas fa-chevron-right"></i>
+      </button>
+      
+      <!-- Indicadores de slide -->
+      <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+        <button
+          v-for="(_, index) in slides"
+          :key="index"
+          @click="currentSlide = index"
+          :class="[
+            'w-3 h-3 rounded-full transition-all duration-300',
+            index === currentSlide ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75'
+          ]"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Contenido -->
+    <div class="container mx-auto px-6 py-20 relative z-5">
       <div class="max-w-4xl mx-auto text-center">
         <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">
           Hotel Management
@@ -61,6 +108,18 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue';
+
+// Imágenes del carrusel
+const slides = ref([
+  '/Fotos/SlidePrincipal/DSC09271.jpg',
+  '/Fotos/SlidePrincipal/DSC09362.jpg',
+  '/Fotos/SlidePrincipal/DSC09409.jpg'
+]);
+
+const currentSlide = ref(0);
+let autoplayInterval: NodeJS.Timeout | null = null;
+
 const navigateToAdmin = () => {
   // Verificar si el usuario ya está autenticado
   const token = localStorage.getItem('hotelToken');
@@ -85,4 +144,37 @@ const scrollToFeatures = () => {
     featuresSection.scrollIntoView({ behavior: 'smooth' });
   }
 };
+
+const nextSlide = () => {
+  currentSlide.value = (currentSlide.value + 1) % slides.value.length;
+  resetAutoplay();
+};
+
+const prevSlide = () => {
+  currentSlide.value = (currentSlide.value - 1 + slides.value.length) % slides.value.length;
+  resetAutoplay();
+};
+
+const resetAutoplay = () => {
+  if (autoplayInterval) {
+    clearInterval(autoplayInterval);
+  }
+  startAutoplay();
+};
+
+const startAutoplay = () => {
+  autoplayInterval = setInterval(() => {
+    currentSlide.value = (currentSlide.value + 1) % slides.value.length;
+  }, 5000); // Cambiar imagen cada 5 segundos
+};
+
+onMounted(() => {
+  startAutoplay();
+});
+
+onUnmounted(() => {
+  if (autoplayInterval) {
+    clearInterval(autoplayInterval);
+  }
+});
 </script>

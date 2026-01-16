@@ -25,27 +25,54 @@ async function setupRealRooms() {
     await connection.execute('ALTER TABLE rooms AUTO_INCREMENT = 1');
     console.log('✅ Contador reiniciado');
 
-    console.log('\n🏨 Configurando 20 habitaciones reales del Hotel Sol...');
-    console.log('====================================================');
+    console.log('\n🏨 Configurando habitaciones del Hotel Sol...');
+    console.log('==========================================');
 
-    // Configurar habitaciones Piso 1 (101-109) - 9 habitaciones estándar
-    console.log('🏢 PISO 1 - Habitaciones Estándar:');
-    for (let i = 101; i <= 109; i++) {
+    // Configuración real de habitaciones según el hotel
+    const habitaciones = [
+      // Piso 1
+      { numero: '101', tipo: 'doble', piso: 1, precio: 120000, capacidad: 2 },
+      { numero: '102', tipo: 'doble', piso: 1, precio: 120000, capacidad: 2 },
+      { numero: '103', tipo: 'familiar', piso: 1, precio: 180000, capacidad: 4 },
+      { numero: '104', tipo: 'sencilla', piso: 1, precio: 80000, capacidad: 1 },
+      { numero: '105', tipo: 'doble', piso: 1, precio: 120000, capacidad: 2 },
+      { numero: '106', tipo: 'doble', piso: 1, precio: 120000, capacidad: 2 },
+      { numero: '107', tipo: 'sencilla', piso: 1, precio: 80000, capacidad: 1 },
+      { numero: '108', tipo: 'doble', piso: 1, precio: 120000, capacidad: 2 },
+      { numero: '109', tipo: 'familiar', piso: 1, precio: 180000, capacidad: 4 },
+      // Piso 2
+      { numero: '211', tipo: 'doble', piso: 2, precio: 120000, capacidad: 2 },
+      { numero: '212', tipo: 'doble', piso: 2, precio: 120000, capacidad: 2 },
+      { numero: '213', tipo: 'doble', piso: 2, precio: 120000, capacidad: 2 },
+      { numero: '214', tipo: 'doble', piso: 2, precio: 120000, capacidad: 2 },
+      { numero: '215', tipo: 'doble', piso: 2, precio: 120000, capacidad: 2 },
+      { numero: '216', tipo: 'doble', piso: 2, precio: 120000, capacidad: 2 },
+      { numero: '217', tipo: 'doble', piso: 2, precio: 120000, capacidad: 2 },
+      { numero: '218', tipo: 'doble', piso: 2, precio: 120000, capacidad: 2 },
+      { numero: '219', tipo: 'doble', piso: 2, precio: 120000, capacidad: 2 }
+    ];
+
+    // Insertar habitaciones
+    console.log('🏢 PISO 1 - Habitaciones:');
+    for (const hab of habitaciones.filter(h => h.piso === 1)) {
+      const tipoTexto = hab.tipo === 'doble' ? 'Doble' : hab.tipo === 'sencilla' ? 'Sencilla' : 'Familiar';
+      const precio = hab.precio === 80000 ? '80.000' : hab.precio === 120000 ? '120.000' : '180.000';
       await connection.execute(`
-        INSERT INTO rooms (room_number, type, capacity, price_per_night, amenities) 
-        VALUES (?, 'standard', 2, 80.00, 'Habitación estándar con cama matrimonial, baño privado, TV, aire acondicionado')
-      `, [i.toString()]);
-      console.log(`✅ Habitación ${i} - Estándar - $80/noche`);
+        INSERT INTO rooms (room_number, type, capacity, price_per_night, floor, description, current_status, is_available) 
+        VALUES (?, ?, ?, ?, ?, ?, 'available', true)
+      `, [hab.numero, hab.tipo, hab.capacidad, hab.precio, hab.piso, `Habitación ${tipoTexto} - ${hab.capacidad} personas - COP ${precio}/noche`]);
+      console.log(`✅ Habitación ${hab.numero} - ${tipoTexto} - COP ${precio}/noche - ${hab.capacidad} personas`);
     }
 
-    // Configurar habitaciones Piso 2 (201-211) - 11 habitaciones ejecutivas
-    console.log('\n🏢 PISO 2 - Habitaciones Ejecutivas:');
-    for (let i = 201; i <= 211; i++) {
+    console.log('\n🏢 PISO 2 - Habitaciones:');
+    for (const hab of habitaciones.filter(h => h.piso === 2)) {
+      const tipoTexto = hab.tipo === 'doble' ? 'Doble' : hab.tipo === 'sencilla' ? 'Sencilla' : 'Familiar';
+      const precio = hab.precio === 80000 ? '80.000' : hab.precio === 120000 ? '120.000' : '180.000';
       await connection.execute(`
-        INSERT INTO rooms (room_number, type, capacity, price_per_night, amenities) 
-        VALUES (?, 'executive', 2, 120.00, 'Habitación ejecutiva con cama king size, baño con jacuzzi, TV smart, aire acondicionado, minibar')
-      `, [i.toString()]);
-      console.log(`✅ Habitación ${i} - Ejecutiva - $120/noche`);
+        INSERT INTO rooms (room_number, type, capacity, price_per_night, floor, description, current_status, is_available) 
+        VALUES (?, ?, ?, ?, ?, ?, 'available', true)
+      `, [hab.numero, hab.tipo, hab.capacidad, hab.precio, hab.piso, `Habitación ${tipoTexto} - ${hab.capacidad} personas - COP ${precio}/noche`]);
+      console.log(`✅ Habitación ${hab.numero} - ${tipoTexto} - COP ${precio}/noche - ${hab.capacidad} personas`);
     }
 
     // Verificar configuración

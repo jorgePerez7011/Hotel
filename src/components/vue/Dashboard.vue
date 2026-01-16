@@ -14,6 +14,10 @@
             </div>
           </div>
           <div class="flex items-center space-x-4">
+            <!-- Date and Time Display -->
+            <div class="text-right bg-blue-50 px-4 py-2 rounded-lg border">
+              <p class="text-blue-900 font-medium text-sm">📅 {{ currentDateTime }}</p>
+            </div>
             <div class="text-right bg-gray-50 px-4 py-2 rounded-lg">
               <p class="text-gray-900 font-medium">👤 {{ currentUser.name }}</p>
               <p class="text-gray-600 text-sm capitalize">🏷️ {{ currentUser.position === 'admin' ? 'Administrador' : 'Empleado' }}</p>
@@ -37,10 +41,12 @@
         <div 
           v-for="stat in stats" 
           :key="stat.title"
+          @click="stat.title === 'Ingresos del Mes' ? handleStatClick(stat.title) : null"
+          :class="stat.title === 'Ingresos del Mes' ? 'cursor-pointer hover:shadow-lg transition-all' : ''"
           class="bg-white p-6 rounded-xl shadow-sm border"
         >
           <div class="flex items-center justify-between">
-            <div>
+            <div class="flex-1">
               <p class="text-gray-600 text-sm font-medium">{{ stat.title }}</p>
               <p class="text-2xl font-bold text-gray-900 mt-1">{{ stat.value }}</p>
             </div>
@@ -48,11 +54,22 @@
               <i :class="stat.icon" class="text-white text-xl"></i>
             </div>
           </div>
-          <div class="mt-4 flex items-center">
-            <span :class="stat.changeClass" class="text-sm font-medium">
-              {{ stat.change }}
-            </span>
-            <span class="text-gray-600 text-sm ml-2">estado actual</span>
+          <div class="mt-4 flex items-center justify-between">
+            <div class="flex items-center">
+              <span :class="stat.changeClass" class="text-sm font-medium">
+                {{ stat.change }}
+              </span>
+              <span class="text-gray-600 text-sm ml-2">estado actual</span>
+            </div>
+            <!-- Botón de descarga para Ingresos del Mes -->
+            <button 
+              v-if="stat.title === 'Ingresos del Mes'"
+              @click.stop="downloadMonthlyIncomeExcel"
+              class="ml-2 p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+              title="Descargar como Excel"
+            >
+              <i class="fas fa-download text-lg"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -77,7 +94,12 @@
                 class="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
               >
                 <div>
-                  <h4 class="font-semibold text-gray-900">{{ booking.guest }}</h4>
+                  <div class="flex items-center gap-2">
+                    <h4 class="font-semibold text-gray-900">{{ booking.guest }}</h4>
+                    <span v-if="booking.isCompanyBooking" class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded font-semibold">
+                      <i class="fas fa-building mr-1"></i>{{ booking.company }}
+                    </span>
+                  </div>
                   <p class="text-gray-600 text-sm">Habitación {{ booking.room }} • {{ booking.dates }}</p>
                 </div>
                 <span :class="booking.statusClass" class="px-3 py-1 rounded-full text-sm font-medium">
@@ -403,7 +425,7 @@
                               @input="updateTotalAmount(room)"
                             >
                             <span class="text-xs text-gray-500">x {{ calculateNights(room.check_in_date, room.check_out_date) }}</span>
-                            <span class="font-medium min-w-[80px] text-right">= {{ Number(room.price_per_night * calculateNights(room.check_in_date, room.check_out_date)).toLocaleString() }}.00</span>
+                            <span class="font-medium min-w-[80px] text-right">= {{ Number(room.price_per_night * calculateNights(room.check_in_date, room.check_out_date)).toLocaleString() }}</span>
                           </div>
                         </div>
                         
@@ -434,7 +456,7 @@
                         
                         <div class="flex justify-between text-sm">
                           <span>Subtotal sin impuestos:</span>
-                          <span class="font-medium">COP {{ Number(room.price_per_night * calculateNights(room.check_in_date, room.check_out_date)).toLocaleString() }}.00</span>
+                          <span class="font-medium">COP {{ Number(room.price_per_night * calculateNights(room.check_in_date, room.check_out_date)).toLocaleString() }}</span>
                         </div>
                         
                         <div class="flex justify-between text-sm items-center">
@@ -484,7 +506,7 @@
                       <div class="space-y-2 text-sm">
                         <div class="flex justify-between">
                           <span class="text-gray-600">ALOJAMIENTO:</span>
-                          <span class="font-semibold">COP {{ Number(room.price_per_night * calculateNights(room.check_in_date, room.check_out_date)).toLocaleString() }}.00</span>
+                          <span class="font-semibold">COP {{ Number(room.price_per_night * calculateNights(room.check_in_date, room.check_out_date)).toLocaleString() }}</span>
                         </div>
                         <div v-if="room.discount_amount > 0" class="flex justify-between text-red-600">
                           <span>DESCUENTOS:</span>
@@ -615,7 +637,7 @@
             </h4>
             
             <div 
-              v-for="room in reservedRooms.filter(r => r.current_status === 'available')" 
+              v-for="(room, index) in reservedRooms.filter(r => r.current_status === 'available')" 
               :key="room.id"
               class="border border-green-200 rounded-lg p-4 hover:bg-green-50 transition-colors bg-green-25"
             >
@@ -623,7 +645,7 @@
                 <div class="flex-1">
                   <div class="flex items-center mb-2">
                     <h4 class="text-lg font-semibold text-gray-900">
-                      Habitación {{ room.room_number }}
+                      Habitación {{ room.room_number || (index < 9 ? (101 + index) : (201 + (index - 9))) }}
                     </h4>
                     <span class="ml-2 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
                       {{ room.type }}
@@ -636,7 +658,7 @@
                   <div class="grid grid-cols-2 gap-4 text-sm text-gray-600">
                     <div>
                       <span class="font-medium">Precio por noche:</span>
-                      <span class="ml-1 text-green-600 font-medium">${{ Number(room.price_per_night).toFixed(2) }}</span>
+                      <span class="ml-1 text-green-600 font-medium">COP {{ Number(room.price_per_night).toLocaleString() }}</span>
                     </div>
                     <div>
                       <span class="font-medium">Piso:</span>
@@ -727,7 +749,7 @@
           <div v-if="selectedRoom" class="bg-gray-50 rounded-lg p-3">
             <div class="flex justify-between text-sm">
               <span>Precio por noche:</span>
-              <span class="font-medium">${{ Number(selectedRoom.price_per_night).toFixed(2) }}</span>
+              <span class="font-medium">COP {{ Number(selectedRoom.price_per_night).toLocaleString() }}</span>
             </div>
             <div class="flex justify-between text-sm">
               <span>Noches:</span>
@@ -736,7 +758,7 @@
             <hr class="my-2">
             <div class="flex justify-between font-semibold text-green-600">
               <span>Total:</span>
-              <span>${{ (Number(selectedRoom.price_per_night) * walkInForm.nights).toFixed(2) }}</span>
+              <span>COP {{ (Number(selectedRoom.price_per_night) * walkInForm.nights).toLocaleString() }}</span>
             </div>
           </div>
 
@@ -771,11 +793,509 @@
       </div>
     </div>
   </div>
+
+  <!-- Company Checkin Component -->
+  <CompanyCheckin
+    :showCompanyCheckinModal="showCompanyCheckinModal"
+    :availableRooms="companyAvailableRooms"
+    @close="showCompanyCheckinModal = false"
+    @submit="handleCompanyCheckinSubmit"
+  />
+
+  <!-- Monthly Income Modal -->
+  <div v-if="showMonthlyIncomeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center">
+            <div class="bg-purple-100 p-3 rounded-lg mr-4">
+              <i class="fas fa-dollar-sign text-2xl text-purple-600"></i>
+            </div>
+            <div>
+              <h3 class="text-2xl font-bold text-gray-900">Ingresos del Mes</h3>
+              <p class="text-gray-600">{{ monthlyIncomeData.month }} - {{ monthlyIncomeData.year }}</p>
+            </div>
+          </div>
+          <button 
+            @click="showMonthlyIncomeModal = false"
+            class="text-gray-500 hover:text-gray-700 text-2xl"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="bg-gray-50 rounded-lg p-4 mb-6 border">
+          <div class="flex flex-col gap-4">
+            <div class="flex items-center gap-4 flex-wrap">
+              <label class="text-sm font-medium text-gray-700">Filtrar por:</label>
+              <button 
+                @click="incomeFilterType = 'month'"
+                :class="incomeFilterType === 'month' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'"
+                class="px-3 py-2 rounded-lg font-medium transition-colors text-sm"
+              >
+                <i class="fas fa-calendar-alt mr-1"></i>Mes Completo
+              </button>
+              <button 
+                @click="incomeFilterType = 'week'"
+                :class="incomeFilterType === 'week' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'"
+                class="px-3 py-2 rounded-lg font-medium transition-colors text-sm"
+              >
+                <i class="fas fa-calendar-week mr-1"></i>Semana
+              </button>
+              <button 
+                @click="incomeFilterType = 'day'"
+                :class="incomeFilterType === 'day' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'"
+                class="px-3 py-2 rounded-lg font-medium transition-colors text-sm"
+              >
+                <i class="fas fa-calendar-day mr-1"></i>Día
+              </button>
+              <button 
+                @click="incomeFilterType = 'range'"
+                :class="incomeFilterType === 'range' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'"
+                class="px-3 py-2 rounded-lg font-medium transition-colors text-sm"
+              >
+                <i class="fas fa-calendar-day mr-1"></i>Rango
+              </button>
+              <button 
+                @click="incomeFilterType = 'select-month'"
+                :class="incomeFilterType === 'select-month' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'"
+                class="px-3 py-2 rounded-lg font-medium transition-colors text-sm"
+              >
+                <i class="fas fa-calendar mr-1"></i>Mes
+              </button>
+            </div>
+
+            <!-- Date picker for specific day -->
+            <div v-if="incomeFilterType === 'day'" class="flex gap-2 items-end">
+              <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">Seleccionar día:</label>
+                <input 
+                  v-model="incomeSelectedDate"
+                  @change="applyIncomeFilter"
+                  type="date"
+                  class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                />
+              </div>
+            </div>
+
+            <!-- Week selector -->
+            <div v-if="incomeFilterType === 'week'" class="flex gap-2 items-end">
+              <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">Semana:</label>
+                <select 
+                  v-model="incomeSelectedWeek"
+                  @change="applyIncomeFilter"
+                  class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                >
+                  <option value="">Seleccionar semana...</option>
+                  <option v-for="(week, index) in incomeWeeksOfMonth" :key="index" :value="index">
+                    {{ week.label }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Date range picker -->
+            <div v-if="incomeFilterType === 'range'" class="flex gap-2 items-end flex-wrap">
+              <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">Desde:</label>
+                <input 
+                  v-model="incomeRangeStart"
+                  type="date"
+                  class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">Hasta:</label>
+                <input 
+                  v-model="incomeRangeEnd"
+                  type="date"
+                  class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                />
+              </div>
+              <div>
+                <button 
+                  @click="applyIncomeFilter"
+                  class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+                >
+                  <i class="fas fa-search mr-1"></i>Filtrar
+                </button>
+              </div>
+            </div>
+
+            <!-- Month selector -->
+            <div v-if="incomeFilterType === 'select-month'" class="flex gap-2 items-end flex-wrap">
+              <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">Seleccionar mes:</label>
+                <select 
+                  v-model="incomeSelectedMonth"
+                  @change="applyIncomeFilter"
+                  class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                >
+                  <option value="">Seleccionar...</option>
+                  <option value="1">Enero</option>
+                  <option value="2">Febrero</option>
+                  <option value="3">Marzo</option>
+                  <option value="4">Abril</option>
+                  <option value="5">Mayo</option>
+                  <option value="6">Junio</option>
+                  <option value="7">Julio</option>
+                  <option value="8">Agosto</option>
+                  <option value="9">Septiembre</option>
+                  <option value="10">Octubre</option>
+                  <option value="11">Noviembre</option>
+                  <option value="12">Diciembre</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1">Año:</label>
+                <select 
+                  v-model="incomeSelectedYear"
+                  @change="applyIncomeFilter"
+                  class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                >
+                  <option value="">Seleccionar...</option>
+                  <option value="2020">2020</option>
+                  <option value="2021">2021</option>
+                  <option value="2022">2022</option>
+                  <option value="2023">2023</option>
+                  <option value="2024">2024</option>
+                  <option value="2025">2025</option>
+                  <option value="2026">2026</option>
+                  <option value="2027">2027</option>
+                  <option value="2028">2028</option>
+                  <option value="2029">2029</option>
+                  <option value="2030">2030</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary Card -->
+        <div class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-8 mb-8 border border-purple-200">
+          <div class="text-center">
+            <p class="text-gray-600 text-sm font-medium mb-2">TOTAL INGRESOS DEL MES</p>
+            <p class="text-5xl font-bold text-purple-600 mb-4">
+              {{ new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(monthlyIncomeData.total_income) }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Breakdown -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <!-- Check-out Income -->
+          <div class="border border-green-200 rounded-lg p-6 bg-green-50">
+            <div class="flex items-center mb-4">
+              <div class="bg-green-100 p-3 rounded-lg mr-3">
+                <i class="fas fa-sign-out-alt text-green-600 text-lg"></i>
+              </div>
+              <h4 class="text-lg font-semibold text-gray-900">Ingresos por Check-out</h4>
+            </div>
+            <p class="text-sm text-gray-600 mb-2">
+              <span class="font-semibold">{{ monthlyIncomeData.checkout_count }}</span> transacciones
+            </p>
+            <p class="text-2xl font-bold text-green-600">
+              {{ new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(monthlyIncomeData.checkout_income) }}
+            </p>
+          </div>
+
+          <!-- Handover Income -->
+          <div class="border border-blue-200 rounded-lg p-6 bg-blue-50">
+            <div class="flex items-center mb-4">
+              <div class="bg-blue-100 p-3 rounded-lg mr-3">
+                <i class="fas fa-handshake text-blue-600 text-lg"></i>
+              </div>
+              <h4 class="text-lg font-semibold text-gray-900">Ingresos por Entregas</h4>
+            </div>
+            <p class="text-sm text-gray-600 mb-2">
+              <span class="font-semibold">{{ monthlyIncomeData.handover_count }}</span> entregas
+            </p>
+            <p class="text-2xl font-bold text-blue-600">
+              {{ new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(monthlyIncomeData.handover_income) }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Tabs for Details -->
+        <div class="mb-8">
+          <div class="flex gap-4 border-b border-gray-200 mb-6 overflow-x-auto">
+            <button 
+              @click="incomeTab = 'all'"
+              :class="incomeTab === 'all' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600 hover:text-gray-900'"
+              class="pb-4 font-semibold transition-colors whitespace-nowrap"
+            >
+              <i class="fas fa-list mr-2"></i>Todas
+            </button>
+            <button 
+              @click="incomeTab = 'checkout'"
+              :class="incomeTab === 'checkout' ? 'border-b-2 border-green-600 text-green-600' : 'text-gray-600 hover:text-gray-900'"
+              class="pb-4 font-semibold transition-colors whitespace-nowrap"
+            >
+              <i class="fas fa-sign-out-alt mr-2"></i>Check-outs
+            </button>
+            <button 
+              @click="incomeTab = 'handover'"
+              :class="incomeTab === 'handover' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 hover:text-gray-900'"
+              class="pb-4 font-semibold transition-colors whitespace-nowrap"
+            >
+              <i class="fas fa-handshake mr-2"></i>Entregas
+            </button>
+            <button 
+              @click="incomeTab = 'details'"
+              :class="incomeTab === 'details' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-gray-600 hover:text-gray-900'"
+              class="pb-4 font-semibold transition-colors whitespace-nowrap"
+            >
+              <i class="fas fa-user mr-2"></i>Detalles Completos
+            </button>
+          </div>
+
+          <!-- Loading State -->
+          <div v-if="loadingIncomeDetails" class="flex items-center justify-center py-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+            <span class="ml-2 text-gray-600">Cargando detalles...</span>
+          </div>
+
+          <!-- Detalles Completos - Nueva pestaña -->
+          <div v-else-if="incomeTab === 'details'" class="space-y-4 max-h-96 overflow-y-auto">
+            <div v-if="allIncomeItems.length === 0" class="text-center py-8 text-gray-500">
+              No hay transacciones en este período
+            </div>
+            <div v-for="(item, index) in allIncomeItems" :key="`details-${index}`" class="border rounded-lg p-6 hover:shadow-md transition-all" :class="item.type === 'checkout' ? 'border-green-300 bg-green-50' : 'border-blue-300 bg-blue-50'">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Guest/Employee Info -->
+                <div>
+                  <p class="text-xs font-semibold text-gray-600 uppercase mb-1">{{ item.type === 'checkout' ? 'Huésped' : 'Empleado' }}</p>
+                  <p class="text-lg font-bold text-gray-900">{{ item.type === 'checkout' ? item.guest_name : (item.employee_name || 'No especificado') }}</p>
+                  <p class="text-sm text-gray-600 mt-1">{{ item.type === 'checkout' ? `Hab. ${item.room_number}` : 'Entrega de Turno' }}</p>
+                </div>
+
+                <!-- Amount -->
+                <div>
+                  <p class="text-xs font-semibold text-gray-600 uppercase mb-1">Monto</p>
+                  <p class="text-2xl font-bold" :class="item.type === 'checkout' ? 'text-green-600' : 'text-blue-600'">
+                    {{ new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(parseFloat(item.amount) || 0) }}
+                  </p>
+                </div>
+
+                <!-- Date Info -->
+                <div>
+                  <p class="text-xs font-semibold text-gray-600 uppercase mb-1">Fecha</p>
+                  <p class="text-lg font-semibold text-gray-900">{{ item.displayDate }}</p>
+                  <p v-if="item.type === 'checkout'" class="text-sm text-gray-600 mt-1">
+                    {{ new Date(item.check_in_date).toLocaleDateString('es-ES') }} - {{ new Date(item.check_out_date).toLocaleDateString('es-ES') }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Todas las transacciones -->
+          <div v-else-if="incomeTab === 'all'" class="space-y-3 max-h-96 overflow-y-auto">
+            <div v-if="allIncomeItems.length === 0" class="text-center py-8 text-gray-500">
+              No hay transacciones en este período
+            </div>
+            <div v-for="(item, index) in allIncomeItems" :key="`all-${index}`" class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="flex-shrink-0 w-10 h-10 rounded-full" :class="item.type === 'checkout' ? 'bg-green-100' : 'bg-blue-100'">
+                    <i :class="item.type === 'checkout' ? 'fas fa-sign-out-alt text-green-600' : 'fas fa-handshake text-blue-600'" class="flex items-center justify-center w-full h-full"></i>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-gray-900">{{ item.description }}</p>
+                    <p class="text-sm text-gray-600">{{ item.displayDate }}</p>
+                  </div>
+                </div>
+                <span class="text-lg font-bold text-gray-900">
+                  {{ new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(parseFloat(item.amount) || 0) }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Check-outs -->
+          <div v-else-if="incomeTab === 'checkout'" class="space-y-3 max-h-96 overflow-y-auto">
+            <div v-if="checkoutIncomeItems.length === 0" class="text-center py-8 text-gray-500">
+              No hay check-outs en este período
+            </div>
+            <div v-for="(item, index) in checkoutIncomeItems" :key="`checkout-${index}`" class="border border-green-200 rounded-lg p-4 bg-green-50 hover:bg-green-100 transition-colors">
+              <div class="flex items-center justify-between mb-2">
+                <div>
+                  <p class="font-semibold text-gray-900">Habitación {{ item.room_number }}</p>
+                  <p class="text-sm text-gray-600">Huésped: {{ item.guest_name }}</p>
+                </div>
+                <span class="text-lg font-bold text-green-600">
+                  {{ new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(parseFloat(item.amount) || 0) }}
+                </span>
+              </div>
+              <div class="text-xs text-gray-600 flex gap-4">
+                <span><strong>Entrada:</strong> {{ new Date(item.check_in_date).toLocaleDateString('es-ES') }}</span>
+                <span><strong>Salida:</strong> {{ new Date(item.check_out_date).toLocaleDateString('es-ES') }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Handovers -->
+          <div v-else-if="incomeTab === 'handover'" class="space-y-3 max-h-96 overflow-y-auto">
+            <div v-if="handoverIncomeItems.length === 0" class="text-center py-8 text-gray-500">
+              No hay entregas en este período
+            </div>
+            <div v-for="(item, index) in handoverIncomeItems" :key="`handover-${index}`" class="border border-blue-200 rounded-lg p-4 bg-blue-50 hover:bg-blue-100 transition-colors">
+              <div class="flex items-center justify-between mb-2">
+                <div>
+                  <p class="font-semibold text-gray-900">Entrega de Turno</p>
+                  <p class="text-sm text-gray-600">Empleado: {{ item.employee_name || 'No especificado' }}</p>
+                </div>
+                <span class="text-lg font-bold text-blue-600">
+                  {{ new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(item.amount) }}
+                </span>
+              </div>
+              <div class="text-xs text-gray-600">
+                <span><strong>Fecha:</strong> {{ new Date(item.created_at).toLocaleDateString('es-ES') }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detailed Information -->
+        <div class="bg-gray-50 rounded-lg p-6 mb-8">
+          <h4 class="font-semibold text-gray-900 mb-4">Información Detallada</h4>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">Mes:</span>
+              <span class="font-semibold text-gray-900">{{ monthlyIncomeData.month }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">Año:</span>
+              <span class="font-semibold text-gray-900">{{ monthlyIncomeData.year }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">Total de Transacciones:</span>
+              <span class="font-semibold text-gray-900">{{ monthlyIncomeData.checkout_count + monthlyIncomeData.handover_count }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">Fecha de Generación:</span>
+              <span class="font-semibold text-gray-900">{{ new Date().toLocaleDateString('es-ES') }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+          <p class="text-sm text-blue-900">
+            <i class="fas fa-info-circle mr-2"></i>
+            <strong>Nota:</strong> Este reporte incluye todas las transacciones completadas. Se excluyen contratos corporativos.
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-4">
+          <button
+            @click="downloadMonthlyIncomeExcel"
+            class="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center"
+          >
+            <i class="fas fa-download mr-2"></i>
+            Descargar Excel
+          </button>
+          <button
+            @click="showMonthlyIncomeModal = false"
+            class="flex-1 bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-400 transition-colors"
+          >
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Modal for Check-in -->
+  <div v-if="showSuccessCheckinModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 p-8 transform transition-all animate-bounce">
+      <!-- Success Icon -->
+      <div class="flex items-center justify-center mb-6">
+        <div class="bg-green-100 p-4 rounded-full">
+          <i class="fas fa-check-circle text-5xl text-green-600"></i>
+        </div>
+      </div>
+
+      <!-- Title -->
+      <h3 class="text-2xl font-bold text-center text-gray-900 mb-4">¡Éxito!</h3>
+
+      <!-- Message -->
+      <p class="text-center text-gray-700 mb-8">{{ successMessage }}</p>
+
+      <!-- Button -->
+      <button
+        @click="showSuccessCheckinModal = false"
+        class="w-full px-4 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+      >
+        <i class="fas fa-check mr-2"></i>Aceptar
+      </button>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal for Check-in -->
+  <div v-if="showConfirmCheckinModal && pendingCheckInRoom" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 p-8 transform transition-all">
+      <!-- Header with Icon -->
+      <div class="flex items-center justify-center mb-6">
+        <div class="bg-blue-100 p-4 rounded-full">
+          <i class="fas fa-check-circle text-3xl text-blue-600"></i>
+        </div>
+      </div>
+
+      <!-- Title -->
+      <h3 class="text-2xl font-bold text-center text-gray-900 mb-4">Confirmar Check-in</h3>
+
+      <!-- Details -->
+      <div class="bg-gray-50 rounded-lg p-4 mb-6 space-y-3">
+        <div class="flex justify-between items-center">
+          <span class="text-gray-600">Habitación:</span>
+          <span class="font-semibold text-gray-900">{{ pendingCheckInRoom.room_number }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-gray-600">Huésped:</span>
+          <span class="font-semibold text-gray-900">{{ pendingCheckInRoom.guest_name }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-gray-600">Noches:</span>
+          <span class="font-semibold text-gray-900">{{ calculateNights(pendingCheckInRoom.check_in_date, pendingCheckInRoom.check_out_date) }}</span>
+        </div>
+        <div class="border-t pt-3 flex justify-between items-center">
+          <span class="text-gray-700 font-medium">Total:</span>
+          <span class="text-xl font-bold text-green-600">COP {{ Number(pendingCheckInRoom.price_per_night * calculateNights(pendingCheckInRoom.check_in_date, pendingCheckInRoom.check_out_date)).toLocaleString() }}</span>
+        </div>
+      </div>
+
+      <!-- Message -->
+      <p class="text-center text-gray-600 mb-6">¿Deseas confirmar el check-in de este huésped?</p>
+
+      <!-- Buttons -->
+      <div class="flex gap-3">
+        <button
+          @click="cancelCheckIn"
+          class="flex-1 px-4 py-3 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
+        >
+          <i class="fas fa-times mr-2"></i>Cancelar
+        </button>
+        <button
+          @click="confirmCheckIn"
+          class="flex-1 px-4 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+        >
+          <i class="fas fa-check mr-2"></i>Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
+import * as XLSX from 'xlsx';
 import ShiftHandoverFinancial from './ShiftHandoverFinancial.vue';
+import CompanyCheckin from './CompanyCheckin.vue';
 
 // User authentication state
 const currentUser = ref({
@@ -783,6 +1303,25 @@ const currentUser = ref({
   position: 'admin',
   email: ''
 });
+
+// Current date and time
+const currentDateTime = ref('');
+let timeInterval: NodeJS.Timeout | null = null;
+let dataInterval: NodeJS.Timeout | null = null;
+
+// Update current date and time
+const updateDateTime = () => {
+  const now = new Date();
+  currentDateTime.value = now.toLocaleString('es-ES', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+};
 
 // Check authentication on component mount
 onMounted(async () => {
@@ -805,9 +1344,45 @@ onMounted(async () => {
 
     // Cargar datos reales de ocupación
     await loadOccupancyData();
+    
+    // Cargar ingresos del mes
+    await loadMonthlyIncome();
+    
+    // Cargar reservas de hoy
+    await loadTodaysBookings();
+    
+    // Cargar últimas 3 reservas recientes
+    await loadRecentBookings();
+    
+    // Iniciar actualización de fecha y hora
+    updateDateTime();
+    timeInterval = setInterval(updateDateTime, 1000);
+    
+    // Actualizar datos cada 5 minutos
+    dataInterval = setInterval(async () => {
+      await loadOccupancyData();
+      await loadMonthlyIncome();
+      await loadTodaysBookings();
+      await loadRecentBookings();
+    }, 5 * 60 * 1000); // 5 minutos
+    
+    // Limpiar intervalos cuando el componente se desmonte
+    return () => {
+      clearInterval(dataInterval);
+    };
   } catch (error) {
     console.error('Error parsing user data:', error);
     window.location.href = '/login';
+  }
+});
+
+// Cleanup interval on unmount
+onUnmounted(() => {
+  if (timeInterval) {
+    clearInterval(timeInterval);
+  }
+  if (dataInterval) {
+    clearInterval(dataInterval);
   }
 });
 
@@ -843,6 +1418,395 @@ const loadOccupancyData = async () => {
   }
 };
 
+// Load monthly income data
+const monthlyIncomeData = ref({
+  total_income: 0,
+  handover_income: 0,
+  checkout_income: 0,
+  handover_count: 0,
+  checkout_count: 0,
+  month: '',
+  year: new Date().getFullYear()
+});
+
+const showMonthlyIncomeModal = ref(false);
+const incomeTab = ref('all');
+const loadingIncomeDetails = ref(false);
+const allIncomeItems = ref([]);
+const handoverIncomeItems = ref([]);
+const checkoutIncomeItems = ref([]);
+
+// Filter variables
+const incomeFilterType = ref('month');
+const incomeSelectedDate = ref('');
+const incomeSelectedWeek = ref('');
+const incomeRangeStart = ref('');
+const incomeRangeEnd = ref('');
+const incomeSelectedMonth = ref('');
+const incomeSelectedYear = ref('');
+const incomeWeeksOfMonth = ref([]);
+const fullMonthAllIncomeItems = ref([]);
+const fullMonthCheckoutItems = ref([]);
+const fullMonthHandoverItems = ref([]);
+
+const handleStatClick = (statTitle) => {
+  console.log('Stat clicked:', statTitle);
+  if (statTitle === 'Ingresos del Mes') {
+    showMonthlyIncomeModal.value = true;
+    loadMonthlyIncomeDetails();
+  }
+};
+
+const loadMonthlyIncome = async () => {
+  try {
+    const response = await fetch('http://localhost:4000/api/handovers/monthly-income');
+    const data = await response.json();
+    
+    if (data.success && data.data) {
+      monthlyIncomeData.value = data.data;
+      
+      const incomeStat = stats.value.find(stat => stat.title === 'Ingresos del Mes');
+      if (incomeStat) {
+        // Formatear el monto en pesos colombianos
+        const formattedAmount = new Intl.NumberFormat('es-CO', {
+          style: 'currency',
+          currency: 'COP',
+          minimumFractionDigits: 0
+        }).format(data.data.total_income);
+        
+        incomeStat.value = formattedAmount;
+        incomeStat.change = `${data.data.handover_count} entregas • ${data.data.month}`;
+      }
+    }
+  } catch (error) {
+    console.error('Error loading monthly income:', error);
+  }
+};
+
+// Load detailed monthly income items
+const loadMonthlyIncomeDetails = async () => {
+  loadingIncomeDetails.value = true;
+  console.log('📥 Iniciando carga de detalles de ingresos...');
+  try {
+    // Cargar todos los datos sin filtro de fecha para permitir filtrado posterior
+    const checkoutResponse = await fetch('http://localhost:4000/api/bookings');
+    const handoverResponse = await fetch('http://localhost:4000/api/handovers');
+    
+    const checkoutData = await checkoutResponse.json();
+    const handoverData = await handoverResponse.json();
+    
+    console.log('📊 Respuesta de checkouts:', checkoutData);
+    console.log('📊 Respuesta de handovers:', handoverData);
+    
+    // Procesar checkouts - incluir checked_in y checked_out
+    const allCheckouts = (checkoutData.bookings || [])
+      .filter(b => b.status === 'checked_out' || b.status === 'checked_in')
+      .map(item => ({
+        ...item,
+        amount: parseFloat(item.total_amount || 0)
+      }));
+      
+    // Procesar handovers
+    const allHandovers = (handoverData.handovers || [])
+      .filter(h => h.status === 'completed')
+      .map(item => ({
+        ...item,
+        amount: parseFloat(item.total_income || 0)
+      }));
+    
+    console.log('✅ Check-outs procesados:', allCheckouts.length);
+    console.log('✅ Entregas procesadas:', allHandovers.length);
+    
+    // Combinar todos y ordenar por fecha más reciente
+    allIncomeItems.value = [
+      ...allCheckouts.map(item => ({
+        ...item,
+        type: 'checkout',
+        isCompanyReservation: item.payment_type === 'company_contract',
+        description: item.payment_type === 'company_contract' 
+          ? `Reserva Empresa - Hab. ${item.room_number} - ${item.guest_name}`
+          : `Check-out - Hab. ${item.room_number} - ${item.guest_name}`,
+        displayDate: new Date(item.check_out_date).toLocaleDateString('es-ES'),
+        sortDate: new Date(item.check_out_date)
+      })),
+      ...allHandovers.map(item => ({
+        ...item,
+        type: 'handover',
+        description: `Entrega de Turno - ${item.employee_name || 'Sin empleado'}`,
+        displayDate: new Date(item.created_at || item.shift_date).toLocaleDateString('es-ES'),
+        sortDate: new Date(item.created_at || item.shift_date)
+      }))
+    ].sort((a, b) => b.sortDate - a.sortDate);
+    
+    // Guardar datos completos para filtrado
+    fullMonthAllIncomeItems.value = [...allIncomeItems.value];
+    fullMonthCheckoutItems.value = [...allCheckouts];
+    fullMonthHandoverItems.value = [...allHandovers];
+    
+    console.log(`✅ Datos almacenados. Total items: ${fullMonthAllIncomeItems.value.length}, Checkouts: ${allCheckouts.length}, Handovers: ${allHandovers.length}`);
+    
+    // Inicializar semanas con mes actual
+    incomeWeeksOfMonth.value = getIncomeWeeksOfMonth();
+    console.log(`📅 Semanas del mes: ${incomeWeeksOfMonth.value.length}`);
+    
+    // Solo resetear filtros si es necesario, preservar select-month
+    if (incomeFilterType.value === '') {
+      incomeFilterType.value = 'month';
+      incomeSelectedDate.value = '';
+      incomeSelectedWeek.value = '';
+    } else if (incomeFilterType.value === 'month') {
+      incomeSelectedDate.value = '';
+      incomeSelectedWeek.value = '';
+      incomeSelectedMonth.value = '';
+      incomeSelectedYear.value = '';
+    } else if (incomeFilterType.value === 'day') {
+      incomeSelectedWeek.value = '';
+      // Preservar month y year si estaban seteados
+    } else if (incomeFilterType.value === 'week') {
+      incomeSelectedDate.value = '';
+      // Preservar month y year si estaban seteados
+    } else if (incomeFilterType.value === 'range') {
+      incomeSelectedDate.value = '';
+      incomeSelectedWeek.value = '';
+      // Preservar month y year si estaban seteados
+    }
+    // Para 'select-month', SIEMPRE preservar los valores de mes y año
+    
+    // Aplicar filtro
+    console.log(`🔄 Reaplicando filtro. Tipo: ${incomeFilterType.value}, Mes: ${incomeSelectedMonth.value}, Año: ${incomeSelectedYear.value}`);
+    applyIncomeFilter();
+    
+    console.log('Detalles de ingresos cargados:', {
+      checkouts: allCheckouts.length,
+      handovers: allHandovers.length,
+      total: allIncomeItems.value.length
+    });
+  } catch (error) {
+    console.error('Error loading monthly income details:', error);
+    allIncomeItems.value = [];
+    checkoutIncomeItems.value = [];
+    handoverIncomeItems.value = [];
+  } finally {
+    loadingIncomeDetails.value = false;
+  }
+};
+
+// Función para obtener las semanas del mes actual
+const getIncomeWeeksOfMonth = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  
+  const weeks = [];
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  
+  let currentDate = new Date(firstDay);
+  let weekNumber = 0;
+  
+  while (currentDate <= lastDay) {
+    const weekStart = new Date(currentDate);
+    const weekEnd = new Date(currentDate);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    
+    if (weekEnd > lastDay) {
+      weekEnd.setDate(lastDay.getDate());
+    }
+    
+    const startStr = weekStart.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
+    const endStr = weekEnd.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
+    
+    weeks.push({
+      index: weekNumber,
+      label: `Semana ${weekNumber + 1}: ${startStr} - ${endStr}`,
+      start: new Date(weekStart),
+      end: new Date(weekEnd)
+    });
+    
+    currentDate.setDate(currentDate.getDate() + 7);
+    weekNumber++;
+  }
+  
+  return weeks;
+};
+
+// Aplicar filtro de ingresos
+const applyIncomeFilter = () => {
+  let filtered = [];
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  
+  // Base: siempre filtramos por mes actual primero, excepto cuando es 'select-month'
+  if (incomeFilterType.value === 'select-month') {
+    // Este filtro permite seleccionar cualquier mes/año
+    if (incomeSelectedMonth.value && incomeSelectedYear.value) {
+      const selectedMonth = parseInt(incomeSelectedMonth.value) - 1;
+      const selectedYear = parseInt(incomeSelectedYear.value);
+      
+      console.log(`🔍 Filtrando por mes seleccionado: ${incomeSelectedMonth.value}/${incomeSelectedYear.value} (index: ${selectedMonth}/${selectedYear})`);
+      console.log(`📊 Total items en fullMonthAllIncomeItems: ${fullMonthAllIncomeItems.value.length}`);
+      
+      filtered = fullMonthAllIncomeItems.value.filter(item => {
+        const itemDate = item.sortDate;
+        const matches = itemDate.getMonth() === selectedMonth && itemDate.getFullYear() === selectedYear;
+        if (matches) {
+          console.log(`✅ Item incluido: ${item.displayDate} - ${item.description}`);
+        }
+        return matches;
+      });
+      
+      console.log(`📍 Items filtrados para ${incomeSelectedMonth.value}/${incomeSelectedYear.value}: ${filtered.length}`);
+    }
+  } else {
+    // Para todos los demás filtros, primero filtramos por mes actual
+    const currentMonthItems = fullMonthAllIncomeItems.value.filter(item => {
+      const itemDate = item.sortDate;
+      return itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear;
+    });
+    
+    // Luego aplicamos el filtro específico
+    if (incomeFilterType.value === 'month') {
+      filtered = [...currentMonthItems];
+    } else if (incomeFilterType.value === 'day' && incomeSelectedDate.value) {
+      const targetDate = new Date(incomeSelectedDate.value);
+      const targetDateStr = targetDate.toISOString().split('T')[0];
+      
+      filtered = currentMonthItems.filter(item => {
+        const itemDate = item.sortDate.toISOString().split('T')[0];
+        return itemDate === targetDateStr;
+      });
+    } else if (incomeFilterType.value === 'week' && incomeSelectedWeek.value !== '') {
+      const week = incomeWeeksOfMonth.value[parseInt(incomeSelectedWeek.value)];
+      if (week) {
+        filtered = currentMonthItems.filter(item => {
+          const itemDate = item.sortDate;
+          return itemDate >= week.start && itemDate <= week.end;
+        });
+      }
+    } else if (incomeFilterType.value === 'range' && incomeRangeStart.value && incomeRangeEnd.value) {
+      const startDate = new Date(incomeRangeStart.value);
+      const endDate = new Date(incomeRangeEnd.value);
+      
+      if (startDate <= endDate) {
+        filtered = currentMonthItems.filter(item => {
+          const itemDate = item.sortDate;
+          return itemDate >= startDate && itemDate <= endDate;
+        });
+      } else {
+        alert('La fecha inicio no puede ser mayor que la fecha fin');
+        return;
+      }
+    } else {
+      filtered = [...currentMonthItems];
+    }
+  }
+  
+  // Actualizar items visibles
+  allIncomeItems.value = filtered;
+  
+  // Recalcular totales
+  const checkouts = filtered.filter(item => item.type === 'checkout');
+  const handovers = filtered.filter(item => item.type === 'handover');
+  
+  checkoutIncomeItems.value = checkouts;
+  handoverIncomeItems.value = handovers;
+  
+  const totalCheckout = checkouts.reduce((sum, item) => sum + (item.amount || 0), 0);
+  const totalHandover = handovers.reduce((sum, item) => sum + (item.amount || 0), 0);
+  
+  console.log(`💾 Datos para el Excel - Checkouts: ${checkouts.length}, Handovers: ${handovers.length}, Total: ${totalCheckout + totalHandover}`);
+  
+  monthlyIncomeData.value.checkout_income = totalCheckout;
+  monthlyIncomeData.value.handover_income = totalHandover;
+  monthlyIncomeData.value.total_income = totalCheckout + totalHandover;
+  monthlyIncomeData.value.checkout_count = checkouts.length;
+  monthlyIncomeData.value.handover_count = handovers.length;
+};
+
+// Watcher para cambiar el tipo de filtro
+watch(() => incomeFilterType.value, () => {
+  console.log(`🔄 Tipo de filtro cambiado a: ${incomeFilterType.value}`);
+  // Resetear selecciones cuando cambia el tipo de filtro
+  if (incomeFilterType.value === 'month') {
+    incomeSelectedDate.value = '';
+    incomeSelectedWeek.value = '';
+    incomeRangeStart.value = '';
+    incomeRangeEnd.value = '';
+    incomeSelectedMonth.value = '';
+    incomeSelectedYear.value = '';
+  }
+  applyIncomeFilter();
+});
+
+// Watcher para cambios en mes/año seleccionado
+watch([() => incomeSelectedMonth.value, () => incomeSelectedYear.value], () => {
+  if (incomeFilterType.value === 'select-month') {
+    console.log(`🔄 Mes/Año cambiado: ${incomeSelectedMonth.value}/${incomeSelectedYear.value}`);
+    applyIncomeFilter();
+  }
+});
+
+// Watcher para cambios en otras selecciones de filtro
+watch([() => incomeSelectedDate.value, () => incomeSelectedWeek.value, () => incomeRangeStart.value, () => incomeRangeEnd.value], () => {
+  if (incomeFilterType.value !== 'select-month') {
+    console.log(`🔄 Filtro seleccionado cambiado`);
+    applyIncomeFilter();
+  }
+});
+
+// Load today's bookings
+const loadTodaysBookings = async () => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const response = await fetch(`http://localhost:4000/api/bookings/by-date/${today}`);
+    const data = await response.json();
+    
+    if (data.success && data.bookings) {
+      const bookingsStat = stats.value.find(stat => stat.title === 'Reservas de Hoy');
+      if (bookingsStat) {
+        bookingsStat.value = data.bookings.length.toString();
+        bookingsStat.change = `${data.bookings.length} huéspedes esperados`;
+      }
+    }
+  } catch (error) {
+    console.error('Error loading today\'s bookings:', error);
+  }
+};
+
+// Load recent bookings (últimas 5 reservas sin importar la fecha)
+const loadRecentBookings = async () => {
+  try {
+    const response = await fetch('http://localhost:4000/api/bookings');
+    const data = await response.json();
+    
+    if (data.success && Array.isArray(data.bookings)) {
+      // Ordenar por check_in_date descendente y tomar las últimas 5
+      const sortedBookings = data.bookings
+        .sort((a, b) => new Date(b.check_in_date) - new Date(a.check_in_date))
+        .slice(0, 5);
+      
+      recentBookings.value = sortedBookings.map(booking => ({
+        id: booking.id,
+        guest: booking.guest_name,
+        company: booking.company_name || null,
+        room: booking.room_number,
+        dates: `${new Date(booking.check_in_date).toLocaleDateString('es-ES')} - ${new Date(booking.check_out_date).toLocaleDateString('es-ES')}`,
+        status: booking.status === 'confirmed' ? 'Confirmada' : booking.status === 'checked_in' ? 'Check-in' : booking.status === 'checked_out' ? 'Realizado' : 'Pendiente',
+        statusClass: booking.status === 'confirmed' ? 'bg-green-100 text-green-800' : 
+                    booking.status === 'checked_in' ? 'bg-blue-100 text-blue-800' : 
+                    booking.status === 'checked_out' ? 'bg-purple-100 text-purple-800' :
+                    'bg-yellow-100 text-yellow-800',
+        isCompanyBooking: !!booking.company_name
+      }));
+      
+      console.log('✅ Últimas 5 reservas cargadas:', recentBookings.value.length);
+    }
+  } catch (error) {
+    console.error('Error loading recent bookings:', error);
+  }
+};
+
 // Logout function
 const handleLogout = () => {
   localStorage.removeItem('hotelToken');
@@ -861,7 +1825,7 @@ const stats = ref([
     iconBg: 'bg-blue-500'
   },
   {
-    title: 'Ocupación del Hotel',
+    title: 'Ocupación Actual',
     value: '0%',
     change: '0/20 habitaciones ocupadas',
     changeClass: 'text-gray-600',
@@ -878,8 +1842,8 @@ const stats = ref([
   },
   {
     title: 'Ingresos del Mes',
-    value: '$2,850,000',
-    change: 'Pesos colombianos',
+    value: '$0',
+    change: 'Sin entregas registradas',
     changeClass: 'text-green-600',
     icon: 'fas fa-dollar-sign',
     iconBg: 'bg-purple-500'
@@ -938,6 +1902,13 @@ const quickActions = ref([
     action: 'quick-checkin'
   },
   {
+    title: 'Check-in Empresas',
+    description: 'Check-in para clientes corporativos',
+    icon: 'fas fa-building',
+    iconBg: 'bg-purple-600',
+    action: 'company-checkin'
+  },
+  {
     title: 'Administrar Habitaciones',
     description: 'Gestión completa de habitaciones',
     icon: 'fas fa-bed',
@@ -952,17 +1923,37 @@ const quickActions = ref([
     action: 'employees'
   },
   {
+    title: 'Crear Nuevo Empleado',
+    description: 'Registrar un nuevo empleado',
+    icon: 'fas fa-user-plus',
+    iconBg: 'bg-green-600',
+    action: 'create-employee'
+  },
+  {
     title: 'Informes y Reportes',
     description: 'Estadísticas del hotel',
     icon: 'fas fa-chart-bar',
     iconBg: 'bg-orange-500',
     action: 'reports'
+  },
+  {
+    title: 'Sistema de Inventarios',
+    description: 'Gestión de productos y materiales',
+    icon: 'fas fa-boxes',
+    iconBg: 'bg-orange-600',
+    action: 'inventory'
   }
 ]);
 
 // Quick Check-in Modal
 const showQuickCheckinModal = ref(false);
+const showCompanyCheckinModal = ref(false);
+const showConfirmCheckinModal = ref(false);
+const showSuccessCheckinModal = ref(false);
+const successMessage = ref('');
+const pendingCheckInRoom = ref(null);
 const reservedRooms = ref([]);
+const companyAvailableRooms = ref([]);
 const loading = ref(false);
 
 // Walk-in Guest Form
@@ -986,8 +1977,11 @@ const handleQuickAction = (action: string) => {
     case 'employees':
       window.location.href = '/admin/employees';
       break;
+    case 'create-employee':
+      window.location.href = '/admin/create-employee';
+      break;
     case 'new-booking':
-      window.location.href = '/';
+      window.location.href = '/admin/new-booking';
       break;
     case 'view-rooms':
       window.location.href = '/rooms';
@@ -999,10 +1993,30 @@ const handleQuickAction = (action: string) => {
       showQuickCheckinModal.value = true;
       fetchReservedRooms();
       break;
+    case 'company-checkin':
+      showCompanyCheckinModal.value = true;
+      fetchAvailableRooms();
+      break;
+    case 'reports':
+      window.location.href = '/admin/reports';
+      break;
+    case 'inventory':
+      window.location.href = '/admin/inventory';
+      break;
     default:
       alert(`Función ${action} - Próximamente implementada`);
   }
 };
+
+// Watcher para recargar habitaciones cuando se abre el modal de Quick Check-in
+watch(
+  () => showQuickCheckinModal.value,
+  (newVal) => {
+    if (newVal) {
+      fetchReservedRooms();
+    }
+  }
+);
 
 // Quick Check-in Functions
 const fetchReservedRooms = async () => {
@@ -1011,25 +2025,87 @@ const fetchReservedRooms = async () => {
     const response = await fetch('http://localhost:4000/api/hotel/rooms');
     const data = await response.json();
     
-    if (data.success) {
-      // Filtrar habitaciones reservadas y disponibles
-      reservedRooms.value = data.rooms.filter(room => 
-        room.current_status === 'reserved' || room.current_status === 'available'
-      ).map(room => ({
+    if (data.success && Array.isArray(data.rooms)) {
+      console.log('🔍 Total de habitaciones recibidas:', data.rooms.length);
+      console.log('📋 Estados de habitaciones:', data.rooms.map(r => ({ number: r.room_number, status: r.current_status })));
+      
+      // Filtrar SOLO habitaciones disponibles (case-insensitive)
+      const filtered = data.rooms.filter(room => {
+        const status = (room.current_status || '').trim().toLowerCase();
+        const isAvailable = status === 'available';
+        
+        if (!isAvailable) {
+          console.log(`❌ Habitación ${room.room_number}: estado="${room.current_status}" (EXCLUIDA)`);
+        }
+        return isAvailable;
+      });
+      
+      console.log(`✅ ${filtered.length} habitaciones DISPONIBLES encontradas de ${data.rooms.length} totales`);
+      
+      reservedRooms.value = filtered.map(room => ({
         ...room,
+        price_per_night: parseInt(room.price_per_night || 0),
         adults: room.adults || 1,
         children: room.children || 0,
         booking_id: room.booking_id || Math.floor(Math.random() * 9000000) + 1000000,
         discount_amount: room.discount_amount || 0,
         additional_charges: room.additional_charges || 0,
         tax_percentage: room.tax_percentage || 0,
-        paid_amount: room.paid_amount || 0
+        paid_amount: room.paid_amount || 0,
+        // Convertir fechas al formato correcto para inputs type="date"
+        check_in_date: formatDateForInput(room.check_in_date),
+        check_out_date: formatDateForInput(room.check_out_date)
+      }));
+      
+      console.log('📊 Habitaciones disponibles procesadas:', reservedRooms.value.length);
+      
+      if (filtered.length === 0) {
+        console.warn('⚠️ ADVERTENCIA: No hay habitaciones disponibles');
+      }
+    } else {
+      console.error('Error: respuesta inválida del servidor', data);
+      reservedRooms.value = [];
+    }
+  } catch (error) {
+    console.error('❌ Error fetching reserved rooms:', error);
+    reservedRooms.value = [];
+  } finally {
+    loading.value = false;
+  }
+};
+
+// Watcher para recargar habitaciones disponibles cuando se abre el modal de Company Check-in
+watch(
+  () => showCompanyCheckinModal.value,
+  (newVal) => {
+    if (newVal) {
+      fetchAvailableRooms();
+    }
+  }
+);
+
+const fetchAvailableRooms = async () => {
+  loading.value = true;
+  try {
+    const response = await fetch('http://localhost:4000/api/hotel/rooms');
+    const data = await response.json();
+    
+    if (data.success) {
+      // Filtrar solo habitaciones disponibles para empresas
+      companyAvailableRooms.value = data.rooms.filter(room => 
+        room.current_status === 'available'
+      ).map(room => ({
+        id: room.id,
+        room_number: room.room_number,
+        type: room.type,
+        price: (room.price || room.price_per_night || 0) * 1000,
+        current_status: room.current_status
       }));
     } else {
       console.error('Error fetching rooms:', data.error);
     }
   } catch (error) {
-    console.error('Error fetching reserved rooms:', error);
+    console.error('Error fetching available rooms:', error);
   } finally {
     loading.value = false;
   }
@@ -1067,40 +2143,9 @@ const performQuickCheckin = async (room) => {
     return;
   }
 
-  // Si es una habitación reservada, hacer check-in directo
-  if (!confirm(`¿Confirmar check-in para la habitación ${room.room_number}?`)) {
-    return;
-  }
-
-  try {
-    const response = await fetch(`http://localhost:4000/api/hotel/rooms/${room.id}/checkin`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        checkin_time: new Date().toISOString()
-      })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      alert(`Check-in realizado exitosamente para la habitación ${room.room_number}`);
-      // Actualizar la lista quitando la habitación
-      reservedRooms.value = reservedRooms.value.filter(r => r.id !== room.id);
-      
-      // Si no quedan habitaciones disponibles, cerrar el modal
-      if (reservedRooms.value.length === 0) {
-        showQuickCheckinModal.value = false;
-      }
-    } else {
-      alert('Error realizando check-in: ' + data.error);
-    }
-  } catch (error) {
-    console.error('Error performing quick check-in:', error);
-    alert('Error al realizar el check-in');
-  }
+  // Mostrar modal de confirmación para reserved rooms también
+  pendingCheckInRoom.value = room;
+  showConfirmCheckinModal.value = true;
 };
 
 const performWalkInCheckin = async () => {
@@ -1115,13 +2160,18 @@ const performWalkInCheckin = async () => {
   }
 
   try {
-    const response = await fetch(`http://localhost:4000/api/hotel/rooms/${selectedRoom.value.id}/checkin`, {
+    const roomId = selectedRoom.value.id;
+    const price = parseInt(selectedRoom.value.price_per_night);
+    
+    const response = await fetch(`http://localhost:4000/api/hotel/rooms/${roomId}/checkin`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         checkin_time: new Date().toISOString(),
+        // Enviar el precio directamente en COP
+        price_per_night: price,
         guest_info: {
           name: walkInForm.value.name,
           email: walkInForm.value.email,
@@ -1135,7 +2185,8 @@ const performWalkInCheckin = async () => {
     const data = await response.json();
 
     if (data.success) {
-      alert(`Check-in realizado exitosamente para ${walkInForm.value.name} en habitación ${selectedRoom.value.room_number}`);
+      successMessage.value = `Check-in realizado exitosamente para ${walkInForm.value.name} en habitación ${selectedRoom.value.room_number}`;
+      showSuccessCheckinModal.value = true;
       
       // Limpiar formulario y cerrar modales
       closeWalkInForm();
@@ -1143,7 +2194,18 @@ const performWalkInCheckin = async () => {
       
       if (reservedRooms.value.length === 0) {
         showQuickCheckinModal.value = false;
+      } else {
+        // Refrescar la lista completa después de 2 segundos
+        setTimeout(() => {
+          console.log('🔄 Recargando habitaciones disponibles...');
+          fetchReservedRooms();
+        }, 2000);
       }
+      
+      // Cerrar el modal de éxito después de 3 segundos
+      setTimeout(() => {
+        showSuccessCheckinModal.value = false;
+      }, 3000);
     } else {
       alert('Error realizando check-in: ' + data.error);
     }
@@ -1157,6 +2219,29 @@ const closeQuickCheckinModal = () => {
   showQuickCheckinModal.value = false;
   reservedRooms.value = [];
   closeWalkInForm();
+};
+
+const closeCompanyCheckinModal = () => {
+  showCompanyCheckinModal.value = false;
+};
+
+const handleCompanyCheckinSubmit = async (checkInData) => {
+  try {
+    console.log('Procesando check-in empresarial:', checkInData);
+    
+    // El componente ya envió la solicitud al servidor
+    // Aquí solo actualizamos el estado local
+    showCompanyCheckinModal.value = false;
+    
+    // Actualizar lista de habitaciones
+    await fetchReservedRooms();
+    
+    // Mostrar mensaje de éxito
+    alert(`Check-in completado exitosamente para ${checkInData.guest_name} en la habitación ${checkInData.room_number}`);
+  } catch (error) {
+    console.error('Error procesando check-in empresarial:', error);
+    alert('Error al procesar el check-in empresarial');
+  }
 };
 
 const closeWalkInForm = () => {
@@ -1262,6 +2347,198 @@ const calculateNights = (checkIn, checkOut) => {
   const endDate = new Date(checkOut);
   const timeDiff = endDate.getTime() - startDate.getTime();
   const nights = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+  return nights;
+};
+
+// Convertir fecha ISO o de cualquier formato a yyyy-MM-dd para inputs type="date"
+const formatDateForInput = (dateStr) => {
+  if (!dateStr) return '';
+  try {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return '';
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  } catch (error) {
+    return '';
+  }
+};
+
+// Download Monthly Income as Excel
+const downloadMonthlyIncomeExcel = () => {
+  try {
+    console.log('📥 Iniciando descarga de Excel...');
+    console.log(`📊 Checkouts en memoria: ${checkoutIncomeItems.value.length}`);
+    console.log(`📊 Handovers en memoria: ${handoverIncomeItems.value.length}`);
+    console.log(`📊 Total items: ${allIncomeItems.value.length}`);
+    
+    // Crear workbook
+    const wb = XLSX.utils.book_new();
+
+    // Calcular totales basados en datos filtrados
+    const totalCheckoutIncome = checkoutIncomeItems.value.reduce((sum, item) => sum + (parseFloat(item.amount || 0)), 0);
+    const totalHandoverIncome = handoverIncomeItems.value.reduce((sum, item) => sum + (parseFloat(item.amount || 0)), 0);
+    const totalIncome = totalCheckoutIncome + totalHandoverIncome;
+
+    // Obtener label del filtro actual
+    let filterLabel = 'Mes Completo';
+    if (incomeFilterType.value === 'day' && incomeSelectedDate.value) {
+      filterLabel = `Día: ${new Date(incomeSelectedDate.value).toLocaleDateString('es-ES')}`;
+    } else if (incomeFilterType.value === 'week' && incomeSelectedWeek.value !== '') {
+      const week = incomeWeeksOfMonth.value[parseInt(incomeSelectedWeek.value)];
+      if (week) filterLabel = week.label;
+    } else if (incomeFilterType.value === 'range' && incomeRangeStart.value && incomeRangeEnd.value) {
+      filterLabel = `Rango: ${new Date(incomeRangeStart.value).toLocaleDateString('es-ES')} - ${new Date(incomeRangeEnd.value).toLocaleDateString('es-ES')}`;
+    } else if (incomeFilterType.value === 'select-month' && incomeSelectedMonth.value && incomeSelectedYear.value) {
+      const months = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+      filterLabel = `${months[parseInt(incomeSelectedMonth.value)]} ${incomeSelectedYear.value}`;
+    }
+
+    // ===== SHEET 1: RESUMEN =====
+    const summaryData = [
+      ['HOTEL SOL - INFORME DE INGRESOS'],
+      [],
+      ['Filtro:', filterLabel],
+      ['Fecha de generación:', new Date().toLocaleDateString('es-ES')],
+      [],
+      ['RESUMEN DE INGRESOS'],
+      ['Concepto', 'Cantidad', 'Monto COP'],
+      ['Ingresos por Check-out', checkoutIncomeItems.value.length.toString(), totalCheckoutIncome.toString()],
+      ['Ingresos por Entregas', handoverIncomeItems.value.length.toString(), totalHandoverIncome.toString()],
+      [],
+      ['TOTAL INGRESOS', '', totalIncome.toString()],
+      [],
+      ['Notas:'],
+      ['- Los datos mostrados corresponden al filtro seleccionado'],
+      ['- Se excluyen contratos corporativos'],
+      ['- Reporte generado automáticamente desde el sistema']
+    ];
+
+    const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+    wsSummary['!cols'] = [
+      { wch: 30 },
+      { wch: 15 },
+      { wch: 20 }
+    ];
+    XLSX.utils.book_append_sheet(wb, wsSummary, 'Resumen');
+
+    // ===== SHEET 2: CHECK-OUTS DETALLADOS =====
+    const checkoutsHeader = ['Habitación', 'Huésped', 'Fecha Entrada', 'Fecha Salida', 'Monto COP'];
+    const checkoutsData = checkoutIncomeItems.value.map(item => [
+      item.room_number || 'N/A',
+      item.guest_name || '',
+      new Date(item.check_in_date).toLocaleDateString('es-ES'),
+      new Date(item.check_out_date).toLocaleDateString('es-ES'),
+      parseFloat(item.amount || 0)
+    ]);
+    
+    const checkoutsSheet = [
+      ['CHECK-OUTS DETALLADOS'],
+      [`Total de Check-outs: ${checkoutIncomeItems.value.length}`],
+      [`Total Ingresos: ${totalCheckoutIncome}`],
+      [],
+      checkoutsHeader,
+      ...checkoutsData
+    ];
+
+    const wsCheckouts = XLSX.utils.aoa_to_sheet(checkoutsSheet);
+    wsCheckouts['!cols'] = [
+      { wch: 15 },
+      { wch: 25 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 15 }
+    ];
+    XLSX.utils.book_append_sheet(wb, wsCheckouts, 'Check-outs');
+
+    // ===== SHEET 3: ENTREGAS DETALLADAS =====
+    const handoversHeader = ['Empleado', 'Fecha', 'Monto COP'];
+    const handoversData = handoverIncomeItems.value.map(item => [
+      item.employee_name || 'Sin especificar',
+      new Date(item.created_at || item.shift_date).toLocaleDateString('es-ES'),
+      parseFloat(item.amount || 0)
+    ]);
+    
+    const handoversSheet = [
+      ['ENTREGAS DE TURNO DETALLADAS'],
+      [`Total de Entregas: ${handoverIncomeItems.value.length}`],
+      [`Total Ingresos: ${totalHandoverIncome}`],
+      [],
+      handoversHeader,
+      ...handoversData
+    ];
+
+    const wsHandovers = XLSX.utils.aoa_to_sheet(handoversSheet);
+    wsHandovers['!cols'] = [
+      { wch: 25 },
+      { wch: 15 },
+      { wch: 15 }
+    ];
+    XLSX.utils.book_append_sheet(wb, wsHandovers, 'Entregas');
+
+    // ===== SHEET 4: TODAS LAS TRANSACCIONES =====
+    const allTransactionsHeader = ['Tipo', 'Descripción', 'Monto COP', 'Fecha'];
+    const allTransactionsData = allIncomeItems.value.map(item => [
+      item.type === 'checkout' ? 'Check-out' : 'Entrega',
+      item.description,
+      parseFloat(item.amount || 0),
+      item.displayDate
+    ]);
+    
+    const allTransactionsSheet = [
+      ['TODAS LAS TRANSACCIONES'],
+      [`Total de transacciones: ${allIncomeItems.value.length}`],
+      [`Total Ingresos: ${totalIncome}`],
+      [],
+      allTransactionsHeader,
+      ...allTransactionsData
+    ];
+
+    const wsAllTransactions = XLSX.utils.aoa_to_sheet(allTransactionsSheet);
+    wsAllTransactions['!cols'] = [
+      { wch: 15 },
+      { wch: 40 },
+      { wch: 15 },
+      { wch: 15 }
+    ];
+    XLSX.utils.book_append_sheet(wb, wsAllTransactions, 'Todas');
+
+    // Generar nombre del archivo basado en el filtro
+    let fileName = '';
+    if (incomeFilterType.value === 'day' && incomeSelectedDate.value) {
+      const date = new Date(incomeSelectedDate.value);
+      fileName = `Ingresos-${date.toISOString().split('T')[0]}.xlsx`;
+    } else if (incomeFilterType.value === 'week' && incomeSelectedWeek.value !== '') {
+      const week = incomeWeeksOfMonth.value[parseInt(incomeSelectedWeek.value)];
+      fileName = `Ingresos-Semana${week.index + 1}-${new Date().getFullYear()}.xlsx`;
+    } else if (incomeFilterType.value === 'range' && incomeRangeStart.value && incomeRangeEnd.value) {
+      const startDate = new Date(incomeRangeStart.value).toISOString().split('T')[0];
+      const endDate = new Date(incomeRangeEnd.value).toISOString().split('T')[0];
+      fileName = `Ingresos-${startDate}_a_${endDate}.xlsx`;
+    } else if (incomeFilterType.value === 'select-month' && incomeSelectedMonth.value && incomeSelectedYear.value) {
+      const monthNum = parseInt(incomeSelectedMonth.value).toString().padStart(2, '0');
+      fileName = `Ingresos-${incomeSelectedYear.value}-${monthNum}.xlsx`;
+    } else {
+      // Mes completo (actual)
+      const now = new Date();
+      const monthNum = (now.getMonth() + 1).toString().padStart(2, '0');
+      fileName = `Ingresos-${now.getFullYear()}-${monthNum}.xlsx`;
+    }
+    
+    XLSX.writeFile(wb, fileName);
+
+    // Mostrar mensaje de éxito
+    successMessage.value = `Archivo descargado: ${fileName}`;
+    showSuccessCheckinModal.value = true;
+    setTimeout(() => {
+      showSuccessCheckinModal.value = false;
+    }, 3000);
+
+  } catch (error) {
+    console.error('Error descargando Excel:', error);
+    alert('Error al descargar el archivo Excel');
+  }
   
   return nights > 0 ? nights : 1;
 };
@@ -1276,15 +2553,25 @@ const processCheckIn = async (room) => {
     }
   }
 
-  const nights = calculateNights(room.check_in_date, room.check_out_date);
+  // Mostrar modal de confirmación
+  pendingCheckInRoom.value = room;
+  showConfirmCheckinModal.value = true;
+};
+
+const confirmCheckIn = async () => {
+  if (!pendingCheckInRoom.value) return;
   
-  if (!confirm(`¿Confirmar check-in para la habitación ${room.room_number}?\nHuésped: ${room.guest_name}\nNoches: ${nights}\nTotal: COP ${Number(room.price_per_night * nights).toLocaleString()}.00`)) {
-    return;
-  }
+  const room = pendingCheckInRoom.value;
+  const nights = calculateNights(room.check_in_date, room.check_out_date);
 
   try {
+    const roomId = room.id;
+    const price = parseInt(room.price_per_night);
+    
     const requestBody = {
-      checkin_time: new Date().toISOString()
+      checkin_time: new Date().toISOString(),
+      // Enviar el precio directamente en COP
+      price_per_night: price
     };
 
     // Si es walk-in, agregar información del huésped
@@ -1298,7 +2585,7 @@ const processCheckIn = async (room) => {
       };
     }
 
-    const response = await fetch(`http://localhost:4000/api/hotel/rooms/${room.id}/checkin`, {
+    const response = await fetch(`http://localhost:4000/api/hotel/rooms/${roomId}/checkin`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -1309,21 +2596,46 @@ const processCheckIn = async (room) => {
     const data = await response.json();
 
     if (data.success) {
-      alert(`Check-in realizado exitosamente para ${room.guest_name} en habitación ${room.room_number}`);
+      successMessage.value = `Check-in realizado exitosamente para ${room.guest_name} en habitación ${room.room_number}`;
+      showSuccessCheckinModal.value = true;
       
       // Remover de la lista y cerrar modal si no quedan más
       reservedRooms.value = reservedRooms.value.filter(r => r.id !== room.id);
       
       if (reservedRooms.value.length === 0) {
         showQuickCheckinModal.value = false;
+      } else {
+        // Refrescar la lista completa después de 2 segundos
+        setTimeout(() => {
+          console.log('🔄 Recargando habitaciones disponibles...');
+          fetchReservedRooms();
+        }, 2000);
       }
+      
+      showConfirmCheckinModal.value = false;
+      pendingCheckInRoom.value = null;
+      
+      // Cerrar el modal de éxito después de 3 segundos
+      setTimeout(() => {
+        showSuccessCheckinModal.value = false;
+      }, 3000);
     } else {
       alert('Error realizando check-in: ' + data.error);
+      console.error('❌ Error en check-in:', data.error);
+      showConfirmCheckinModal.value = false;
+      pendingCheckInRoom.value = null;
     }
   } catch (error) {
     console.error('Error performing check-in:', error);
     alert('Error al realizar el check-in');
+    showConfirmCheckinModal.value = false;
+    pendingCheckInRoom.value = null;
   }
+};
+
+const cancelCheckIn = () => {
+  showConfirmCheckinModal.value = false;
+  pendingCheckInRoom.value = null;
 };
 </script>
 

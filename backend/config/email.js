@@ -7,7 +7,7 @@ dotenv.config();
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER || 'kokocardenas7011@gmail.com',
+    user: process.env.EMAIL_USER || 'solhotel.recepcion@gmail.com',
     pass: process.env.EMAIL_PASSWORD || 'your-app-password-here' // Se debe configurar en .env
   },
   debug: true, // Habilitar debugging
@@ -25,8 +25,8 @@ export const sendBookingRequestEmail = async (bookingData) => {
   const { name, email, phone, roomType, checkIn, checkOut, adults, children, comments, nights } = bookingData;
   
   const mailOptions = {
-    from: 'kokocardenas7011@gmail.com',
-    to: 'kokocardenas7011@gmail.com',
+    from: 'solhotel.recepcion@gmail.com',
+    to: 'solhotel.recepcion@gmail.com',
     subject: `🏨 Nueva Solicitud de Reserva - Hotel Sol`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">

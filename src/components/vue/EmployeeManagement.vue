@@ -174,6 +174,12 @@
                   >
                     <i :class="employee.is_active ? 'fas fa-user-slash' : 'fas fa-user-check'"></i>
                   </button>
+                  <button 
+                    @click="deleteEmployee(employee)"
+                    class="text-red-600 hover:text-red-900"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -190,11 +196,20 @@
     </div>
 
     <!-- Add/Edit Employee Modal -->
-    <div v-if="showAddModal || editingEmployee" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">
-          {{ editingEmployee ? 'Editar Empleado' : 'Agregar Nuevo Empleado' }}
-        </h3>
+    <div v-if="showAddModal || editingEmployee" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">
+            {{ editingEmployee ? 'Editar Empleado' : 'Agregar Nuevo Empleado' }}
+          </h3>
+          <button 
+            @click="cancelEdit"
+            class="text-gray-500 hover:text-gray-700 p-1"
+            title="Cerrar"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
         
         <form @submit.prevent="saveEmployee" class="space-y-4">
           <div>
@@ -216,6 +231,18 @@
               required
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="empleado@hotelsol.com"
+            />
+          </div>
+          
+          <div v-if="!editingEmployee">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña *</label>
+            <input 
+              v-model="employeeForm.password"
+              type="password" 
+              required
+              minlength="6"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Mínimo 6 caracteres"
             />
           </div>
           
@@ -286,12 +313,16 @@
               placeholder="Dirección completa"
             ></textarea>
           </div>
-          
-          <div class="flex justify-end space-x-3 pt-4">
+                    <!-- Indicador de scroll -->
+          <div class="text-center text-sm text-gray-500 py-2 border-t">
+            <i class="fas fa-chevron-down mr-1"></i>
+            Desplázate hacia abajo para ver los botones
+          </div>
+                    <div class="flex justify-end space-x-3 pt-4 border-t mt-6">
             <button 
               type="button"
               @click="cancelEdit"
-              class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium"
+              class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
             >
               Cancelar
             </button>
@@ -300,11 +331,8 @@
               :disabled="isSubmitting"
               class="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-md font-medium transition-colors duration-300"
             >
-              <span v-if="!isSubmitting">{{ editingEmployee ? 'Actualizar' : 'Agregar' }}</span>
-              <span v-else>
-                <i class="fas fa-spinner fa-spin mr-2"></i>
-                {{ editingEmployee ? 'Actualizando...' : 'Agregando...' }}
-              </span>
+              <span v-if="isSubmitting" class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+              {{ editingEmployee ? 'Actualizar Empleado' : 'Agregar Empleado' }}
             </button>
           </div>
         </form>
@@ -347,6 +375,7 @@ const searchTerm = ref('');
 const employeeForm = reactive({
   name: '',
   email: '',
+  password: '',
   phone: '',
   position: '',
   salary: '',
@@ -374,7 +403,7 @@ const filteredEmployees = computed(() => {
 
   if (selectedStatus.value) {
     const isActive = selectedStatus.value === 'active';
-    filtered = filtered.filter(emp => emp.is_active === isActive);
+    filtered = filtered.filter(emp => !!emp.is_active === isActive);
   }
 
   if (searchTerm.value) {
@@ -411,6 +440,7 @@ const resetForm = () => {
   Object.assign(employeeForm, {
     name: '',
     email: '',
+    password: '',
     phone: '',
     position: '',
     salary: '',
@@ -444,10 +474,16 @@ const saveEmployee = async () => {
   try {
     isSubmitting.value = true;
     
-    const employeeData = {
+    let employeeData = {
       ...employeeForm,
       salary: employeeForm.salary ? parseFloat(employeeForm.salary) : null
     };
+
+    // Remove password field when editing (not needed for updates)
+    if (editingEmployee.value) {
+      const { password, ...dataWithoutPassword } = employeeData;
+      employeeData = dataWithoutPassword;
+    }
 
     let response;
     
@@ -518,20 +554,37 @@ const toggleEmployeeStatus = async (employee: Employee) => {
     });
 
     if (response.ok) {
-      const result = await response.json();
-      
-      // Update employee in the list
-      const index = employees.value.findIndex(emp => emp.id === employee.id);
-      if (index !== -1) {
-        employees.value[index] = result.employee;
-      }
-      
+      // Update the employee object directly
+      employee.is_active = !employee.is_active;
       alert(`Empleado ${action}do exitosamente`);
     } else {
       alert('Error al cambiar el estado del empleado');
     }
   } catch (error) {
     console.error('Error toggling employee status:', error);
+    alert('Error de conexión');
+  }
+};
+
+const deleteEmployee = async (employee: Employee) => {
+  if (!confirm(`¿Estás seguro de que quieres eliminar permanentemente a ${employee.name}? Esta acción no se puede deshacer.`)) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`http://localhost:4000/api/employees/${employee.id}`, {
+      method: 'DELETE'
+    });
+
+    if (response.ok) {
+      // Remove employee from the list
+      employees.value = employees.value.filter(emp => emp.id !== employee.id);
+      alert('Empleado eliminado exitosamente');
+    } else {
+      alert('Error al eliminar el empleado');
+    }
+  } catch (error) {
+    console.error('Error deleting employee:', error);
     alert('Error de conexión');
   }
 };

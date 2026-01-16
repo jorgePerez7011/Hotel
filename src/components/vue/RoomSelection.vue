@@ -56,7 +56,7 @@
               </div>
               <div class="text-right">
                 <div class="text-2xl font-bold text-purple-600">
-                  ${{ room.price_per_night || room.pricePerNight }}
+                  COP {{ Number(room.price_per_night || room.pricePerNight).toLocaleString() }}
                 </div>
                 <div class="text-sm text-gray-500">per night</div>
               </div>
@@ -159,12 +159,21 @@ const loadAvailableRooms = async () => {
     loading.value = true;
     
     if (!searchCriteria.value) {
-      // If no search criteria, show all rooms
+      // If no search criteria, show only available rooms
       const response = await fetch('http://localhost:4000/api/hotel/rooms');
       if (response.ok) {
         const data = await response.json();
-        availableRooms.value = data.rooms || data || [];
-        console.log('Loaded rooms:', availableRooms.value);
+        // Filter only available rooms
+        availableRooms.value = (data.rooms || data || [])
+          .filter((room: any) => {
+            const status = (room.current_status || '').trim().toLowerCase();
+            return status === 'available';
+          })
+          .map(room => ({
+            ...room,
+            price_per_night: (room.price_per_night || 0) * 1000
+          }));
+        console.log('Loaded available rooms:', availableRooms.value);
       }
     } else {
       // Search for available rooms
@@ -176,7 +185,16 @@ const loadAvailableRooms = async () => {
       const response = await fetch(`http://localhost:4000/api/hotel/rooms/available?${params}`);
       if (response.ok) {
         const data = await response.json();
-        availableRooms.value = data.availableRooms || [];
+        // Filter only available rooms
+        availableRooms.value = (data.availableRooms || [])
+          .filter((room: any) => {
+            const status = (room.current_status || '').trim().toLowerCase();
+            return status === 'available';
+          })
+          .map(room => ({
+            ...room,
+            price_per_night: (room.price_per_night || 0) * 1000
+          }));
       }
     }
   } catch (error) {
@@ -194,7 +212,7 @@ const getSampleRooms = (): Room[] => {
       id: 1,
       room_number: '101',
       type: 'single',
-      price_per_night: 80,
+      price_per_night: 80000,
       capacity: 1,
       amenities: ['WiFi', 'TV', 'AC'],
       is_available: true
@@ -203,7 +221,7 @@ const getSampleRooms = (): Room[] => {
       id: 2,
       room_number: '102',
       type: 'double',
-      price_per_night: 120,
+      price_per_night: 120000,
       capacity: 2,
       amenities: ['WiFi', 'TV', 'AC', 'Minibar'],
       is_available: true
@@ -212,7 +230,7 @@ const getSampleRooms = (): Room[] => {
       id: 3,
       room_number: '201',
       type: 'suite',
-      price_per_night: 200,
+      price_per_night: 200000,
       capacity: 4,
       amenities: ['WiFi', 'TV', 'AC', 'Minibar', 'Jacuzzi'],
       is_available: true

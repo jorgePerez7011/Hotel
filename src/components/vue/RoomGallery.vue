@@ -6,7 +6,7 @@
         <div class="flex items-center justify-between py-2">
           <!-- Left side - Social Media -->
           <div class="flex items-center space-x-3">
-            <span class="text-sm text-gray-600">Follow Us:</span>
+            <span class="text-sm text-gray-600">Síguenos:</span>
             <a href="#" class="text-gray-500 hover:text-blue-600 transition-colors">
               <i class="fab fa-instagram"></i>
             </a>
@@ -40,31 +40,31 @@
             href="/"
             class="text-white hover:text-blue-300 transition-colors font-medium px-3 py-2 rounded"
           >
-            Home
+            Inicio
           </a>
           <a 
             href="/about"
             class="text-white hover:text-blue-300 transition-colors font-medium px-3 py-2 rounded"
           >
-            About Us
+            Nosotros
           </a>
           <a 
             href="/rooms"
             class="text-blue-300 font-semibold px-3 py-2 bg-gray-700 rounded"
           >
-            Rooms
+            Habitaciones
           </a>
           <a 
-            href="/contact"
+            href="/services"
             class="text-white hover:text-blue-300 transition-colors font-medium px-3 py-2 rounded"
           >
-            Contact
+            Servicios
           </a>
           <a 
             href="/admin/dashboard"
             class="text-white hover:text-blue-300 transition-colors font-medium px-3 py-2 rounded"
           >
-            Dashboard
+            Panel Admin
           </a>
         </div>
       </div>
@@ -74,141 +74,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div class="space-y-16">
         
-        <!-- Habitación Junior Suite - Imagen a la derecha -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div class="lg:flex lg:items-center">
-            <!-- Contenido izquierda -->
-            <div class="lg:w-1/2 p-8 lg:p-12">
-              <div class="mb-4">
-                <span class="bg-orange-500 text-white px-4 py-2 rounded-full text-sm font-semibold">
-                  Premium
-                </span>
-              </div>
-              <h2 class="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
-                Habitación<br>
-                <span class="text-orange-600">Junior Suite</span>
-              </h2>
-              <p class="text-gray-600 text-lg mb-6 leading-relaxed">
-                Habitación con 2 ambientes, vista 180° a la ciudad, con ventanales de techos a piso 
-                para disfrutar de una vista increíble. Perfecta para huéspedes que buscan comodidad y elegancia.
-              </p>
-              <div class="mb-8">
-                <div class="flex flex-wrap gap-3">
-                  <span class="bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium">2 Ambientes</span>
-                  <span class="bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium">Vista 180°</span>
-                  <span class="bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium">Ventanales</span>
-                </div>
-              </div>
-              <button 
-                @click="openBookingForm('Junior Suite')"
-                class="bg-orange-500 text-white px-8 py-3 rounded-lg hover:bg-orange-600 transition-colors font-semibold text-lg"
-              >
-                Reservar
-              </button>
-            </div>
-            <!-- Imagen derecha -->
-            <div class="lg:w-1/2">
-              <div class="relative h-80 lg:h-96">
-                <img 
-                  src="https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                  alt="Habitación Junior Suite"
-                  class="w-full h-full object-cover"
-                >
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Habitación Executive - Imagen a la izquierda -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div class="lg:flex lg:items-center">
-            <!-- Imagen izquierda -->
-            <div class="lg:w-1/2">
-              <div class="relative h-80 lg:h-96">
-                <img 
-                  src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                  alt="Habitación Executive"
-                  class="w-full h-full object-cover"
-                >
-              </div>
-            </div>
-            <!-- Contenido derecha -->
-            <div class="lg:w-1/2 p-8 lg:p-12">
-              <div class="mb-4">
-                <span class="bg-yellow-500 text-white px-4 py-2 rounded-full text-sm font-semibold">
-                  Executive
-                </span>
-              </div>
-              <h2 class="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
-                Habitación<br>
-                <span class="text-yellow-600">Executive</span>
-              </h2>
-              <p class="text-gray-600 text-lg mb-6 leading-relaxed">
-                Una habitación para dos personas con todas las comodidades y amenidades de lujo 
-                ubicadas en nuestro piso más alto. Ideal para ejecutivos y viajeros de negocios.
-              </p>
-              <div class="mb-8">
-                <div class="flex flex-wrap gap-3">
-                  <span class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full text-sm font-medium">2 Personas</span>
-                  <span class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full text-sm font-medium">Piso Alto</span>
-                  <span class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full text-sm font-medium">Lujo</span>
-                </div>
-              </div>
-              <button 
-                @click="openBookingForm('Executive')"
-                class="bg-yellow-500 text-white px-8 py-3 rounded-lg hover:bg-yellow-600 transition-colors font-semibold text-lg"
-              >
-                Reservar
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Habitación Suite - Imagen a la derecha -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div class="lg:flex lg:items-center">
-            <!-- Contenido izquierda -->
-            <div class="lg:w-1/2 p-8 lg:p-12">
-              <div class="mb-4">
-                <span class="bg-purple-500 text-white px-4 py-2 rounded-full text-sm font-semibold">
-                  Luxury Suite
-                </span>
-              </div>
-              <h2 class="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
-                Habitación<br>
-                <span class="text-purple-600">Suite</span>
-              </h2>
-              <p class="text-gray-600 text-lg mb-6 leading-relaxed">
-                Habitación con tres ambientes separados, sala de estar, habitación principal, baño amplio. 
-                Ideal para presidentes y directivos de alto rango que buscan el máximo lujo y comodidad.
-              </p>
-              <div class="mb-8">
-                <div class="flex flex-wrap gap-3">
-                  <span class="bg-purple-100 text-purple-800 px-4 py-2 rounded-full text-sm font-medium">3 Ambientes</span>
-                  <span class="bg-purple-100 text-purple-800 px-4 py-2 rounded-full text-sm font-medium">Sala de Estar</span>
-                  <span class="bg-purple-100 text-purple-800 px-4 py-2 rounded-full text-sm font-medium">Baño Amplio</span>
-                  <span class="bg-purple-100 text-purple-800 px-4 py-2 rounded-full text-sm font-medium">Presidencial</span>
-                </div>
-              </div>
-              <button 
-                @click="openBookingForm('Suite')"
-                class="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition-colors font-semibold text-lg"
-              >
-                Reservar Suite
-              </button>
-            </div>
-            <!-- Imagen derecha -->
-            <div class="lg:w-1/2">
-              <div class="relative h-80 lg:h-96">
-                <img 
-                  src="https://images.unsplash.com/photo-1590490360182-c33d57733427?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                  alt="Habitación Suite"
-                  class="w-full h-full object-cover"
-                >
-              </div>
-            </div>
-          </div>
-        </div>
+        
 
         <!-- Habitación Doble - Imagen a la izquierda -->
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
@@ -217,7 +83,7 @@
             <div class="lg:w-1/2">
               <div class="relative h-80 lg:h-96">
                 <img 
-                  src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                  src="/Fotos/Habitaciones/Doble.jpg" 
                   alt="Habitación Doble"
                   class="w-full h-full object-cover"
                 >
@@ -291,7 +157,7 @@
             <div class="lg:w-1/2">
               <div class="relative h-80 lg:h-96">
                 <img 
-                  src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                  src="/Fotos/Habitaciones/Sencilla.jpg" 
                   alt="Habitación Sencilla"
                   class="w-full h-full object-cover"
                 >
@@ -307,7 +173,7 @@
             <div class="lg:w-1/2">
               <div class="relative h-80 lg:h-96">
                 <img 
-                  src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                  src="/Fotos/Habitaciones/Familiar.jpg" 
                   alt="Habitación Familiar"
                   class="w-full h-full object-cover"
                 >
@@ -411,7 +277,7 @@
               v-model="bookingForm.phone"
               type="tel"
               required
-              placeholder="+57 (300) 123-4567"
+              placeholder="+57 317 6388290 - 323 3928158"
               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
           </div>

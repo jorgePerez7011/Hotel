@@ -48,8 +48,7 @@
                     <span class="text-sm italic text-gray-600">Síguenos:</span>
                     <div class="flex space-x-2">
                         <a href="#" class="text-gray-600 hover:text-primary-600"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-gray-600 hover:text-primary-600"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="text-gray-600 hover:text-primary-600"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.facebook.com/solhotel1/?locale=es_LA" target="_blank" class="text-gray-600 hover:text-primary-600"><i class="fab fa-facebook"></i></a>
                     </div>
                 </div>
                 
@@ -61,7 +60,7 @@
                 <!-- Contact Info -->
                 <div class="flex items-center space-x-2">
                     <i class="fas fa-phone text-primary-600"></i>
-                    <a href="tel:+573001234567" class="text-gray-600 hover:text-primary-600">+57 (300) 123-4567</a>
+                    <a href="tel:+573001234567" class="text-gray-600 hover:text-primary-600">+57 317 6388290</a>
                 </div>
             </div>
         </div>
@@ -81,8 +80,16 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
-        <div class="container mx-auto px-6 text-center">
+    <section class="relative text-white py-20 overflow-hidden">
+        <!-- Background Image -->
+        <div class="absolute inset-0 z-0">
+            <img src="/Fotos/FrenteHotel.jpg" alt="Hotel Sol" class="w-full h-full object-cover">
+            <!-- Overlay oscuro para mejor legibilidad -->
+            <div class="absolute inset-0 bg-black/50"></div>
+        </div>
+        
+        <!-- Contenido -->
+        <div class="container mx-auto px-6 text-center relative z-10">
             <div class="mb-8">
                 <h1 class="text-5xl md:text-6xl font-bold mb-4">Sol Hotel</h1>
                 <p class="text-2xl md:text-3xl font-semibold text-primary-200">Confianza y Calidad</p>
@@ -94,123 +101,138 @@
         </div>
     </section>
 
-    <!-- Misión, Visión y Valores -->
+    <!-- Carrusel de Misión, Visión y Valores -->
     <section class="py-20 bg-white">
         <div class="container mx-auto px-6">
-            <!-- Misión -->
-            <div class="mb-16">
-                <div class="text-center mb-12">
-                    <h2 class="text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center">
-                        <span class="text-5xl mr-4">🎯</span> MISIÓN
-                    </h2>
-                    <div class="w-20 h-1 bg-primary-600 mx-auto"></div>
-                </div>
-                <div class="bg-gradient-to-r from-primary-50 to-blue-50 rounded-2xl p-8 md:p-12 shadow-lg">
-                    <p class="text-lg md:text-xl text-gray-700 leading-relaxed text-center max-w-4xl mx-auto">
-                        Nuestra pasión es brindar la mejor atención a nuestros huéspedes con hospitalidad, mediante un trato individualizado con amabilidad, compromiso y calidad, desarrollando productos y servicios que garantizan la satisfacción y expectativas del cliente.
-                    </p>
-                </div>
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Conoce Nuestros Principios</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Descubre los valores y principios que nos guían en nuestra misión de brindar la mejor experiencia hotelera
+                </p>
+                <div class="w-20 h-1 bg-primary-600 mx-auto mt-6"></div>
             </div>
 
-            <!-- Visión -->
-            <div class="mb-16">
-                <div class="text-center mb-12">
-                    <h2 class="text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center">
-                        <span class="text-5xl mr-4">🌟</span> VISIÓN
-                    </h2>
-                    <div class="w-20 h-1 bg-primary-600 mx-auto"></div>
-                </div>
-                <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-8 md:p-12 shadow-lg">
-                    <p class="text-lg md:text-xl text-gray-700 leading-relaxed text-center max-w-4xl mx-auto">
-                        Trabajamos para ser reconocidos, tanto por nuestras modernas instalaciones como por el servicio familiar y cercano que nos diferencia de la competencia.
-                    </p>
-                </div>
-            </div>
+            <!-- Carrusel Container -->
+            <div class="relative max-w-6xl mx-auto">
+                <!-- Carrusel Content -->
+                <div class="overflow-hidden rounded-3xl shadow-2xl">
+                    <div id="carousel-track" class="flex transition-transform duration-700 ease-in-out">
+                        
+                        <!-- Slide 1: Misión -->
+                        <div class="w-full flex-shrink-0">
+                            <div class="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white p-12 lg:p-16 min-h-[400px] flex items-center relative overflow-hidden">
+                                <!-- Elementos decorativos de fondo -->
+                                <div class="absolute top-10 right-10 text-blue-300/20 text-8xl transform rotate-12">
+                                    <i class="fas fa-bullseye"></i>
+                                </div>
+                                <div class="absolute bottom-10 left-10 text-blue-300/10 text-6xl transform -rotate-12">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                                
+                                <div class="w-full text-center z-10 relative">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/1628/1628441.png" class="w-32 h-32 mx-auto mb-8 animate-pulse" alt="Misión">
+                                    <h3 class="text-5xl font-bold mb-8 tracking-wide">MISIÓN</h3>
+                                    <div class="w-32 h-1 bg-yellow-400 mx-auto mb-8"></div>
+                                    <p class="text-xl md:text-2xl leading-relaxed max-w-4xl mx-auto font-light">
+                                        Nuestra pasión es brindar la mejor atención a nuestros huéspedes con hospitalidad, mediante un trato individualizado con amabilidad, compromiso y calidad, desarrollando productos y servicios que garantizan la satisfacción y expectativas del cliente.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
 
-            <!-- Valores -->
-            <div class="mb-16">
-                <div class="text-center mb-12">
-                    <h2 class="text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center">
-                        <span class="text-5xl mr-4">💎</span> VALORES
-                    </h2>
-                    <div class="w-20 h-1 bg-primary-600 mx-auto"></div>
+                        <!-- Slide 2: Visión -->
+                        <div class="w-full flex-shrink-0">
+                            <div class="bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 text-white p-12 lg:p-16 min-h-[400px] flex items-center relative overflow-hidden">
+                                <!-- Elementos decorativos de fondo -->
+                                <div class="absolute top-10 left-10 text-purple-300/20 text-8xl transform -rotate-12">
+                                    <i class="fas fa-telescope"></i>
+                                </div>
+                                <div class="absolute bottom-10 right-10 text-purple-300/10 text-6xl transform rotate-12">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                
+                                <div class="w-full text-center z-10 relative">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/9640/9640649.png" class="w-32 h-32 mx-auto mb-8 animate-pulse" alt="Visión">
+                                    <h3 class="text-5xl font-bold mb-8 tracking-wide">VISIÓN</h3>
+                                    <div class="w-32 h-1 bg-yellow-400 mx-auto mb-8"></div>
+                                    <p class="text-xl md:text-2xl leading-relaxed max-w-4xl mx-auto font-light">
+                                        Trabajamos para ser reconocidos, tanto por nuestras modernas instalaciones como por el servicio familiar y cercano que nos diferencia de la competencia.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 3: Valores -->
+                        <div class="w-full flex-shrink-0">
+                            <div class="bg-gradient-to-br from-green-600 via-green-700 to-green-800 text-white p-12 lg:p-16 min-h-[600px] flex items-center relative overflow-hidden">
+                                <!-- Elementos decorativos de fondo -->
+                                <div class="absolute top-10 right-10 text-green-300/20 text-8xl transform rotate-12">
+                                    <i class="fas fa-gem"></i>
+                                </div>
+                                <div class="absolute bottom-10 left-10 text-green-300/10 text-6xl transform -rotate-12">
+                                    <i class="fas fa-handshake"></i>
+                                </div>
+                                
+                                <div class="w-full text-center z-10 relative">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/11282/11282325.png" class="w-32 h-32 mx-auto mb-8 animate-pulse" alt="Valores">
+                                    <h3 class="text-5xl font-bold mb-8 tracking-wide">VALORES</h3>
+                                    <div class="w-32 h-1 bg-yellow-400 mx-auto mb-8"></div>
+                                    <p class="text-lg mb-12 max-w-3xl mx-auto font-light">
+                                        Los valores de Sol Hotel están interrelacionados y se complementan mutuamente. Estos son la base de nuestro trabajo y nuestra mejora diaria.
+                                    </p>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto z-10 relative">
+                                    <div class="bg-white/20 backdrop-blur-sm rounded-xl p-6 text-center hover:bg-white/30 transition-all duration-300 hover:scale-105">
+                                        <div class="text-4xl mb-4">✨</div>
+                                        <h4 class="font-bold text-xl mb-3">CALIDAD</h4>
+                                        <p class="text-sm leading-relaxed">Compromisos de calidad garantizando la excelencia en cada detalle de la experiencia de nuestros huéspedes.</p>
+                                    </div>
+                                    
+                                    <div class="bg-white/20 backdrop-blur-sm rounded-xl p-6 text-center hover:bg-white/30 transition-all duration-300 hover:scale-105">
+                                        <div class="text-4xl mb-4">🤝</div>
+                                        <h4 class="font-bold text-xl mb-3">TRABAJO EN EQUIPO</h4>
+                                        <p class="text-sm leading-relaxed">Un equipo que trabaja conjuntamente para lograr la satisfacción del cliente y la de uno mismo.</p>
+                                    </div>
+                                    
+                                    <div class="bg-white/20 backdrop-blur-sm rounded-xl p-6 text-center hover:bg-white/30 transition-all duration-300 hover:scale-105">
+                                        <div class="text-4xl mb-4">🛡️</div>
+                                        <h4 class="font-bold text-xl mb-3">CONFIANZA</h4>
+                                        <p class="text-sm leading-relaxed">Servicios e instalaciones de calidad que mejoramos y modernizamos año tras año.</p>
+                                    </div>
+                                    
+                                    <div class="bg-white/20 backdrop-blur-sm rounded-xl p-6 text-center hover:bg-white/30 transition-all duration-300 hover:scale-105">
+                                        <div class="text-4xl mb-4">⭐</div>
+                                        <h4 class="font-bold text-xl mb-3">SERVICIO EXCEPCIONAL</h4>
+                                        <p class="text-sm leading-relaxed">El mejor nivel de servicio en cada interacción con nuestros huéspedes.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                     
+                    </div>
                 </div>
+
+                <!-- Botones de Navegación -->
+                <button id="prevBtn" class="absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-4 rounded-full shadow-xl transition-all duration-300 hover:scale-110 z-20 opacity-80 hover:opacity-100">
+                    <i class="fas fa-chevron-left text-xl"></i>
+                </button>
                 
-                <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-8 md:p-12 shadow-lg mb-8">
-                    <p class="text-lg md:text-xl text-gray-700 leading-relaxed text-center max-w-4xl mx-auto">
-                        Los valores de Sol Hotel Confort y Calidad están interrelacionados y se complementan mutuamente. Estos son la base de nuestro trabajo y nuestra mejora diaria.
-                    </p>
+                <button id="nextBtn" class="absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-4 rounded-full shadow-xl transition-all duration-300 hover:scale-110 z-20 opacity-80 hover:opacity-100">
+                    <i class="fas fa-chevron-right text-xl"></i>
+                </button>
+
+                <!-- Indicadores de Slide -->
+                <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
+                    <button class="slide-indicator w-4 h-4 rounded-full bg-white/50 hover:bg-white transition-all duration-300 active-slide" data-slide="0"></button>
+                    <button class="slide-indicator w-4 h-4 rounded-full bg-white/50 hover:bg-white transition-all duration-300" data-slide="1"></button>
+                    <button class="slide-indicator w-4 h-4 rounded-full bg-white/50 hover:bg-white transition-all duration-300" data-slide="2"></button>
                 </div>
 
-                <!-- Grid de Valores -->
-                <div class="grid md:grid-cols-2 gap-8">
-                    <!-- Calidad -->
-                    <div class="group bg-white rounded-xl p-8 shadow-lg border-l-4 border-primary-500 hover:shadow-2xl hover:border-primary-600 hover:-translate-y-2 hover:scale-105 transition-all duration-500 ease-out cursor-pointer relative overflow-hidden">
-                        <!-- Efecto de fondo animado -->
-                        <div class="absolute inset-0 bg-gradient-to-br from-primary-50 to-blue-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        <div class="relative z-10">
-                            <div class="text-center mb-6">
-                                <div class="text-4xl mb-4 transform group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">✨</div>
-                                <h3 class="text-2xl font-bold text-gray-900 group-hover:text-primary-700 transition-colors duration-300">CALIDAD</h3>
-                            </div>
-                            <p class="text-gray-700 text-center leading-relaxed group-hover:text-gray-800 transition-colors duration-300">
-                                Son compromisos de calidad para nuestros servicios, garantizando la excelencia en cada detalle de la experiencia de nuestros huéspedes.
-                            </p>
-                        </div>
-                        <!-- Brillo sutil al hacer hover -->
-                        <div class="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-pulse"></div>
-                    </div>
-
-                    <!-- Trabajo en Equipo -->
-                    <div class="group bg-white rounded-xl p-8 shadow-lg border-l-4 border-green-500 hover:shadow-2xl hover:border-green-600 hover:-translate-y-2 hover:scale-105 transition-all duration-500 ease-out cursor-pointer relative overflow-hidden">
-                        <!-- Efecto de fondo animado -->
-                        <div class="absolute inset-0 bg-gradient-to-br from-green-50 to-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        <div class="relative z-10">
-                            <div class="text-center mb-6">
-                                <div class="text-4xl mb-4 transform group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">🤝</div>
-                                <h3 class="text-2xl font-bold text-gray-900 group-hover:text-green-700 transition-colors duration-300">TRABAJO EN EQUIPO</h3>
-                            </div>
-                            <p class="text-gray-700 text-center leading-relaxed group-hover:text-gray-800 transition-colors duration-300">
-                                La clave de nuestro éxito es el capital humano, un equipo que trabaja conjuntamente para lograr la satisfacción del cliente y la de uno mismo.
-                            </p>
-                        </div>
-                        <!-- Brillo sutil al hacer hover -->
-                        <div class="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-pulse"></div>
-                    </div>
-
-                    <!-- Confianza -->
-                    <div class="group bg-white rounded-xl p-8 shadow-lg border-l-4 border-yellow-500 hover:shadow-2xl hover:border-yellow-600 hover:-translate-y-2 hover:scale-105 transition-all duration-500 ease-out cursor-pointer relative overflow-hidden">
-                        <!-- Efecto de fondo animado -->
-                        <div class="absolute inset-0 bg-gradient-to-br from-yellow-50 to-amber-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        <div class="relative z-10">
-                            <div class="text-center mb-6">
-                                <div class="text-4xl mb-4 transform group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">🛡️</div>
-                                <h3 class="text-2xl font-bold text-gray-900 group-hover:text-yellow-700 transition-colors duration-300">CONFIANZA</h3>
-                            </div>
-                            <p class="text-gray-700 text-center leading-relaxed group-hover:text-gray-800 transition-colors duration-300">
-                                Cada vez que nos visitan es un nuevo reto para nosotros, conseguir que su próxima visita sea todavía mejor que la anterior y ofreciéndoles unos servicios e instalaciones con la mejor calidad, que mejoramos y modernizamos año tras año.
-                            </p>
-                        </div>
-                        <!-- Brillo sutil al hacer hover -->
-                        <div class="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-pulse"></div>
-                    </div>
-
-                    <!-- Servicio Excepcional -->
-                    <div class="group bg-white rounded-xl p-8 shadow-lg border-l-4 border-red-500 hover:shadow-2xl hover:border-red-600 hover:-translate-y-2 hover:scale-105 transition-all duration-500 ease-out cursor-pointer relative overflow-hidden">
-                        <!-- Efecto de fondo animado -->
-                        <div class="absolute inset-0 bg-gradient-to-br from-red-50 to-pink-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        <div class="relative z-10">
-                            <div class="text-center mb-6">
-                                <div class="text-4xl mb-4 transform group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">⭐</div>
-                                <h3 class="text-2xl font-bold text-gray-900 group-hover:text-red-700 transition-colors duration-300">SERVICIO EXCEPCIONAL</h3>
-                            </div>
-                            <p class="text-gray-700 text-center leading-relaxed group-hover:text-gray-800 transition-colors duration-300">
-                                El servicio de la mejor calidad siempre atraerá a los clientes. Entregarlo de esa manera debe ser una norma, manteniendo el mismo nivel de servicio en cada oportunidad que se interactúe con nuestros huéspedes.
-                            </p>
-                        </div>
-                        <!-- Brillo sutil al hacer hover -->
-                        <div class="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-pulse"></div>
-                    </div>
+                <!-- Barra de Progreso -->
+                <div class="absolute bottom-0 left-0 w-full h-1 bg-black/20 z-10">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 transition-all duration-700 ease-out" style="width: 33.33%;"></div>
                 </div>
             </div>
         </div>
@@ -239,8 +261,8 @@
 
                 <!-- Piscina y Spa -->
                 <div class="text-center bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-                    <div class="text-5xl text-primary-600 mb-6">🏊</div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Piscina y Spa</h3>
+                    <div class="text-5xl text-primary-600 mb-6">☂️</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Sala Comun</h3>
                     <p class="text-gray-600 leading-relaxed">
                         Instalaciones de relajación y bienestar para que disfrutes de momentos de tranquilidad y renovación.
                     </p>
@@ -289,8 +311,8 @@
                     <h3 class="text-2xl font-bold mb-6">Nuestra Ubicación</h3>
                     <div class="space-y-4">
                         <p class="text-primary-100">
-                            Calle 123 #45-67<br>
-                            Centro, Bogotá<br>
+                            Cl. 19 #8-56<br>
+                            San Martín, Cesar<br>
                             Colombia
                         </p>
                     </div>
@@ -303,14 +325,19 @@
                     <div class="space-y-4">
                         <div>
                             <p class="font-semibold">Teléfono:</p>
-                            <a href="tel:+573001234567" class="text-primary-200 hover:text-white text-lg">
-                                +57 (300) 123-4567
-                            </a>
+                            <div class="space-y-2">
+                                <a href="tel:+573001234567" class="text-primary-200 hover:text-white text-lg block">
+                                   +57 317 6388290 - 323 3928158
+                                </a>
+                                <a href="tel:+573233928158" class="text-primary-200 hover:text-white text-lg block">
+                                   +57 323 3928158
+                                </a>
+                            </div>
                         </div>
                         <div>
                             <p class="font-semibold">Email:</p>
-                            <a href="mailto:kokocardenas7011@gmail.com" class="text-primary-200 hover:text-white">
-                                kokocardenas7011@gmail.com
+                            <a href="mailto:solhotel.recepcion@gmail.com" class="text-primary-200 hover:text-white">
+                                solhotel.recepcion@gmail.com
                             </a>
                         </div>
                     </div>
@@ -326,63 +353,162 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-12">
-        <div class="container mx-auto px-6">
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- Opening Hours -->
-                <div>
-                    <h4 class="text-xl font-bold mb-6">Horarios de Atención</h4>
-                    <div class="space-y-2">
-                        <div class="flex justify-between">
-                            <span>Entre semana:</span>
-                            <span class="text-gray-300">8:00–20:00</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Fin de semana:</span>
-                            <span class="text-gray-300">9:00–18:00</span>
-                        </div>
-                    </div>
-                    <p class="text-gray-400 text-sm mt-6">
-                        © 2025 Hotel Sol. Todos los derechos reservados.
-                    </p>
-                </div>
+  
+
+    <style>
+        /* Estilos del Carrusel */
+        .slide-indicator.active-slide {
+            background-color: white !important;
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Animaciones suaves */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        .fas {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .carousel-slide h3 {
+                font-size: 2.5rem !important;
+            }
+            
+            .carousel-slide p {
+                font-size: 1.1rem !important;
+            }
+        }
+    </style>
+
+    <script>
+        // Variables del carrusel
+        let currentSlide = 0;
+        const totalSlides = 3;
+
+        // Función para ir al siguiente slide
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateCarousel();
+        }
+
+        // Función para ir al slide anterior
+        function prevSlide() {
+            currentSlide = currentSlide === 0 ? totalSlides - 1 : currentSlide - 1;
+            updateCarousel();
+        }
+
+        // Función para ir a un slide específico
+        function goToSlide(slideIndex) {
+            if (slideIndex >= 0 && slideIndex < totalSlides) {
+                currentSlide = slideIndex;
+                updateCarousel();
+            }
+        }
+
+        // Función para actualizar la posición del carrusel
+        function updateCarousel() {
+            const track = document.getElementById('carousel-track');
+            const indicators = document.querySelectorAll('.slide-indicator');
+            const progressBar = document.getElementById('progress-bar');
+            
+            // Mover el carrusel
+            if (track) {
+                track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            }
+            
+            // Actualizar indicadores
+            indicators.forEach((indicator, index) => {
+                if (index === currentSlide) {
+                    indicator.classList.add('active-slide');
+                } else {
+                    indicator.classList.remove('active-slide');
+                }
+            });
+            
+            // Actualizar barra de progreso
+            if (progressBar) {
+                const progressWidth = ((currentSlide + 1) / totalSlides) * 100;
+                progressBar.style.width = progressWidth + '%';
+            }
+        }
+
+        // Inicializar el carrusel cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar event listeners para los botones
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const indicators = document.querySelectorAll('.slide-indicator');
+            const carouselContainer = document.querySelector('.relative.max-w-6xl');
+            
+            // Botones de navegación
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    prevSlide();
+                });
+            }
+            
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    nextSlide();
+                });
+            }
+            
+            // Indicadores
+            indicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    goToSlide(index);
+                });
+            });
+            
+            // Pausar auto-slide cuando el mouse está sobre el carrusel
+            if (carouselContainer) {
+                // Soporte para gestos táctiles (móvil)
+                let startX = 0;
+                let endX = 0;
                 
-                <!-- Address -->
-                <div>
-                    <h4 class="text-xl font-bold mb-6">Dirección</h4>
-                    <div class="space-y-4">
-                        <div class="flex items-start space-x-3">
-                            <i class="fas fa-map-marker-alt text-primary-500 mt-1"></i>
-                            <span class="text-gray-300">Calle 123 #45-67, Centro, Bogotá, Colombia</span>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-phone text-primary-500"></i>
-                            <a href="tel:+573001234567" class="text-gray-300 hover:text-white">+57 (300) 123-4567</a>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-envelope text-primary-500"></i>
-                            <a href="mailto:kokocardenas7011@gmail.com" class="text-gray-300 hover:text-white">kokocardenas7011@gmail.com</a>
-                        </div>
-                    </div>
-                </div>
+                carouselContainer.addEventListener('touchstart', function(e) {
+                    startX = e.touches[0].clientX;
+                });
                 
-                <!-- Newsletter -->
-                <div>
-                    <h4 class="text-xl font-bold mb-6">Boletín Informativo</h4>
-                    <form class="flex">
-                        <input 
-                            type="email" 
-                            placeholder="Ingrese su correo electrónico"
-                            class="flex-1 px-4 py-2 rounded-l-lg text-gray-900"
-                        />
-                        <button class="bg-primary-600 hover:bg-primary-700 px-6 py-2 rounded-r-lg transition-colors">
-                            Suscribirse
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </footer>
+                carouselContainer.addEventListener('touchend', function(e) {
+                    endX = e.changedTouches[0].clientX;
+                    handleSwipe();
+                });
+                
+                function handleSwipe() {
+                    const swipeThreshold = 50;
+                    const diff = startX - endX;
+                    
+                    if (Math.abs(diff) > swipeThreshold) {
+                        if (diff > 0) {
+                            nextSlide(); // Swipe left - next slide
+                        } else {
+                            prevSlide(); // Swipe right - previous slide
+                        }
+                    }
+                }
+            }
+            
+            // Soporte para teclado
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                } else if (e.key === 'ArrowRight') {
+                    nextSlide();
+                }
+            });
+            
+            // Inicializar el carrusel
+            updateCarousel();
+        });
+    </script>
 </body>
 </html>

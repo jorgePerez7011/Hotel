@@ -51,7 +51,7 @@
               type="email" 
               required
               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors bg-white"
-              placeholder="juan.perez@hotelsol.com"
+              placeholder="juan.perez@ejemplo.com"
               :disabled="isSubmitting"
             />
           </div>
@@ -319,11 +319,6 @@ const handleRegister = async () => {
       throw new Error('La contraseña debe tener al menos 6 caracteres');
     }
 
-    // Email domain validation
-    if (!registerForm.email.includes('@hotelsol.com')) {
-      throw new Error('El email debe ser del dominio @hotelsol.com');
-    }
-
     // Prepare data for API
     const employeeData = {
       name: registerForm.name,
@@ -339,10 +334,12 @@ const handleRegister = async () => {
     };
 
     // Call API
+    const token = localStorage.getItem('hotelToken');
     const response = await fetch('http://localhost:4000/api/employees', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : ''
       },
       body: JSON.stringify(employeeData)
     });

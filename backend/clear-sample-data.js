@@ -22,10 +22,12 @@ async function clearSampleData() {
     const [handovers] = await connection.execute('SELECT COUNT(*) as count FROM shift_handovers');
     const [transactions] = await connection.execute('SELECT COUNT(*) as count FROM shift_transactions');
     const [employees] = await connection.execute('SELECT COUNT(*) as count FROM employees');
+    const [bookings] = await connection.execute('SELECT COUNT(*) as count FROM bookings');
     
     console.log(`📊 Entregas de turno existentes: ${handovers[0].count}`);
     console.log(`💰 Transacciones existentes: ${transactions[0].count}`);
     console.log(`👥 Empleados existentes: ${employees[0].count}`);
+    console.log(`🏨 Reservas existentes: ${bookings[0].count}`);
 
     // Confirmar eliminación
     console.log('\n⚠️  ATENCIÓN: Se eliminarán TODOS los datos de ejemplo');
@@ -41,6 +43,11 @@ async function clearSampleData() {
     const deleteHandovers = await connection.execute('DELETE FROM shift_handovers');
     console.log(`✅ ${deleteHandovers[0].affectedRows} entregas de turno eliminadas`);
 
+    // 3. Eliminar todas las reservas de ejemplo
+    console.log('🗑️  Eliminando reservas...');
+    const deleteBookings = await connection.execute('DELETE FROM bookings');
+    console.log(`✅ ${deleteBookings[0].affectedRows} reservas eliminadas`);
+
     // 3. Eliminar empleados de ejemplo (opcional - descomenta si quieres eliminarlos)
     /*
     console.log('🗑️  Eliminando empleados de ejemplo...');
@@ -52,6 +59,7 @@ async function clearSampleData() {
     console.log('🔄 Reiniciando contadores...');
     await connection.execute('ALTER TABLE shift_handovers AUTO_INCREMENT = 1');
     await connection.execute('ALTER TABLE shift_transactions AUTO_INCREMENT = 1');
+    await connection.execute('ALTER TABLE bookings AUTO_INCREMENT = 1');
     // await connection.execute('ALTER TABLE employees AUTO_INCREMENT = 1'); // Descomenta si eliminaste empleados
 
     console.log('✅ Contadores reiniciados');
@@ -62,10 +70,12 @@ async function clearSampleData() {
     const [handoversAfter] = await connection.execute('SELECT COUNT(*) as count FROM shift_handovers');
     const [transactionsAfter] = await connection.execute('SELECT COUNT(*) as count FROM shift_transactions');
     const [employeesAfter] = await connection.execute('SELECT COUNT(*) as count FROM employees');
+    const [bookingsAfter] = await connection.execute('SELECT COUNT(*) as count FROM bookings');
     
     console.log(`📊 Entregas de turno restantes: ${handoversAfter[0].count}`);
     console.log(`💰 Transacciones restantes: ${transactionsAfter[0].count}`);
     console.log(`👥 Empleados restantes: ${employeesAfter[0].count}`);
+    console.log(`🏨 Reservas restantes: ${bookingsAfter[0].count}`);
 
     // 6. Mostrar estructura limpia de las tablas
     console.log('\n📋 Estructura de tablas mantenida:');
@@ -75,6 +85,9 @@ async function clearSampleData() {
     
     const [transactionColumns] = await connection.execute('DESCRIBE shift_transactions');
     console.log(`✅ Tabla shift_transactions: ${transactionColumns.length} campos`);
+
+    const [bookingColumns] = await connection.execute('DESCRIBE bookings');
+    console.log(`✅ Tabla bookings: ${bookingColumns.length} campos`);
 
     console.log('\n🎉 LIMPIEZA COMPLETADA EXITOSAMENTE');
     console.log('=====================================');

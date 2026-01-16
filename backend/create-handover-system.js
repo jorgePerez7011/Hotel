@@ -22,6 +22,7 @@ const createShiftHandoverTable = async () => {
         rooms_available INT DEFAULT 0,
         pending_checkouts INT DEFAULT 0,
         pending_checkins INT DEFAULT 0,
+        selected_rooms JSON,
         
         -- Observaciones y novedades
         general_notes TEXT,

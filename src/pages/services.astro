@@ -1,0 +1,274 @@
+---
+// Services page - Página de Servicios del Hotel Sol
+---
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servicios - Hotel Sol</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="font-sans">
+    <!-- Navigation Header -->
+    <header class="bg-white shadow-sm relative z-50">
+        <!-- Top Panel -->
+        <div class="bg-gray-100 py-2 px-6">
+            <div class="container mx-auto flex justify-between items-center">
+                <!-- Social Links -->
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm italic text-gray-600">Síguenos:</span>
+                    <div class="flex space-x-2">
+                        <a href="#" class="text-gray-600 hover:text-primary-600"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.facebook.com/solhotel1/?locale=es_LA" target="_blank" class="text-gray-600 hover:text-primary-600"><i class="fab fa-facebook"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Logo -->
+                <div class="text-center">
+                    <h1 class="text-2xl font-bold text-gray-800">HOTEL SOL</h1>
+                </div>
+                
+                <!-- Contact Info -->
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-phone text-primary-600"></i>
+                    <a href="tel:+573001234567" class="text-gray-600 hover:text-primary-600">+57 317 6388290 - 323 3928158</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Navigation -->
+        <nav class="py-4 px-6">
+            <div class="container mx-auto flex justify-center">
+                <ul class="flex space-x-8">
+                    <li><a href="/" class="text-gray-700 hover:text-primary-600 transition-colors">Inicio</a></li>
+                    <li><a href="/about" class="text-gray-700 hover:text-primary-600 transition-colors">Nosotros</a></li>
+                    <li><a href="/rooms" class="text-gray-700 hover:text-primary-600 transition-colors">Habitaciones</a></li>
+                    <li><a href="/services" class="text-primary-600 font-semibold border-b-2 border-primary-600 pb-1">Servicios</a></li>
+                    <li><a href="/admin/dashboard" class="text-gray-700 hover:text-primary-600 transition-colors">Panel Admin</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Services Hero Section -->
+    <section class="bg-gradient-to-br from-primary-900 to-primary-700 text-white py-20">
+        <div class="container mx-auto px-6 text-center">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6">Nuestros Servicios</h1>
+            <p class="text-xl md:text-2xl text-primary-100">Descubre todas las comodidades y servicios que ofrecemos para tu estadía</p>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            
+            <!-- Recepción 24/7 -->
+            <div class="grid lg:grid-cols-2 gap-12 items-center mb-20">
+                <div>
+                    <h3 class="text-4xl font-bold mb-6 text-gray-900">Recepción 24/7</h3>
+                    <p class="text-gray-700 mb-6 text-lg leading-relaxed">Contamos con un equipo profesional de recepcionistas disponibles las 24 horas del día para asistirte en cualquier momento. Desde tu llegada hasta tu partida, estamos listos para brindarte el mejor servicio y resolver cualquier inconveniente.</p>
+                    <ul class="space-y-3 text-gray-700 mb-8">
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Personal disponible 24 horas</li>
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Atención multilingüe</li>
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Información turística</li>
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Asistencia en reservaciones y traslados</li>
+                    </ul>
+                </div>
+                <div class="h-96 rounded-lg overflow-hidden shadow-xl">
+                    <img src="/Fotos/Recepcion.jpg" alt="Recepción" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                </div>
+            </div>
+
+            <!-- Restaurante -->
+            <div class="grid lg:grid-cols-2 gap-12 items-center mb-20">
+                <div class="h-96 rounded-lg overflow-hidden shadow-xl">
+                    <img src="/Fotos/SalaComun.jpg" alt="Restaurante" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                </div>
+                <div>
+                    <h3 class="text-4xl font-bold mb-6 text-gray-900">Restaurante</h3>
+                    <p class="text-gray-700 mb-6 text-lg leading-relaxed">Nuestro restaurante ofrece una experiencia culinaria excepcional con platos nacionales e internacionales preparados por nuestro experimentado equipo de chef. Disfrutá de una variedad de sabores en un ambiente elegante y acogedor.</p>
+                    <ul class="space-y-3 text-gray-700 mb-8">
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Menú variado y actualizado</li>
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Atención 24/7</li>
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Eventos y celebraciones especiales</li>
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Opciones vegetarianas y sin gluten</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Lavandería -->
+            <div class="grid lg:grid-cols-2 gap-12 items-center mb-20">
+                <div>
+                    <h3 class="text-4xl font-bold mb-6 text-gray-900">Lavandería</h3>
+                    <p class="text-gray-700 mb-6 text-lg leading-relaxed">Servicio completo de lavandería y planchado de ropa con personal altamente capacitado. Utilizamos los mejores detergentes para cuidar tus prendas y devolverte ropa impecable en el menor tiempo posible.</p>
+                    <ul class="space-y-3 text-gray-700 mb-8">
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Lavado express disponible</li>
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Planchado profesional</li>
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Entrega rápida en tu habitación</li>
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Cuidado especial de prendas delicadas</li>
+                    </ul>
+                </div>
+                <div class="h-96 rounded-lg overflow-hidden shadow-xl">
+                    <img src="/Fotos/Lavanderia.jpg" alt="Lavandería" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                </div>
+            </div>
+
+            <!-- Parqueadero -->
+            <div class="grid lg:grid-cols-2 gap-12 items-center mb-20">
+                <div class="h-96 rounded-lg overflow-hidden shadow-xl">
+                    <img src="/Fotos/Parqueadero.jpg" alt="Parqueadero" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                </div>
+                <div>
+                    <h3 class="text-4xl font-bold mb-6 text-gray-900">Parqueadero</h3>
+                    <p class="text-gray-700 mb-6 text-lg leading-relaxed">Disponemos de amplias áreas de estacionamiento seguro, vigiladas las 24 horas del día. Tu vehículo estará protegido y accesible en todo momento durante tu estadía en nuestro hotel.</p>
+                    <ul class="space-y-3 text-gray-700 mb-8">
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Vigilancia 24/7 con cámaras</li>
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Amplio espacio para todo tipo de vehículos</li>
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Acceso rápido desde la entrada</li>
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Tarifa incluida en tu hospedaje</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Gym -->
+            <div class="grid lg:grid-cols-2 gap-12 items-center mb-20">
+                <div>
+                    <h3 class="text-4xl font-bold mb-6 text-gray-900">Gimnasio</h3>
+                    <p class="text-gray-700 mb-6 text-lg leading-relaxed">Contamos con un gimnasio completamente equipado con máquinas de última tecnología, pesas libres y áreas de entrenamiento funcional. Perfecto para mantener tu rutina de ejercicio mientras te hospedas con nosotros.</p>
+                    <ul class="space-y-3 text-gray-700 mb-8">
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Equipos modernos y bien mantenidos</li>
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Acceso 24 horas para huéspedes</li>
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Entrenador personal disponible</li>
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Clases grupales en horarios específicos</li>
+                    </ul>
+                </div>
+                <div class="h-96 rounded-lg overflow-hidden shadow-xl">
+                    <img src="/Fotos/Gym.jpg" alt="Gimnasio" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                </div>
+            </div>
+
+            <!-- Altar de Oración -->
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="h-96 rounded-lg overflow-hidden shadow-xl">
+                    <img src="/Fotos/Altar.jpg" alt="Altar de Oración" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                </div>
+                <div>
+                    <h3 class="text-4xl font-bold mb-6 text-gray-900">Altar de Oración</h3>
+                    <p class="text-gray-700 mb-6 text-lg leading-relaxed">Contamos con un espacio sagrado dedicado a la meditación y la oración. Un lugar tranquilo y acogedor donde los huéspedes de todas las creencias pueden encontrar paz espiritual y momentos de reflexión durante su estadía con nosotros.</p>
+                    <ul class="space-y-3 text-gray-700 mb-8">
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Espacio de meditación y contemplación</li>
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Ambiente tranquilo y sereno</li>
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Acceso libre durante todo el día</li>
+                        <li class="flex items-center text-lg"><i class="fas fa-check text-green-500 mr-4 text-xl"></i>Respetuoso con todas las creencias</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-20">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl font-bold mb-6">¿Listo para disfrutar de nuestros servicios?</h2>
+            <p class="text-xl mb-8 text-primary-100">Contáctanos para más información o reserva tu habitación ahora</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/" class="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-primary-50 transition-colors">Reservar Ahora</a>
+                <a href="/about" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-primary-600 transition-colors">Conoce Más</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Opening Hours -->
+                <div>
+                    <h4 class="text-xl font-bold mb-6">Horarios de Atención</h4>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span>Entre semana:</span>
+                            <span class="text-gray-300">8:00–20:00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Fin de semana:</span>
+                            <span class="text-gray-300">9:00–18:00</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm mt-6">
+                        © 2025 Hotel Sol. Todos los derechos reservados.
+                    </p>
+                </div>
+                
+                <!-- Address -->
+                <div>
+                    <h4 class="text-xl font-bold mb-6">Dirección</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-map-marker-alt text-primary-500 mt-1"></i>
+                            <span class="text-gray-300">Cl. 19 #8-56, San Martín, Cesar</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-phone text-primary-500"></i>
+                            <a href="tel:+573001234567" class="text-gray-300 hover:text-white">+57  - 323 3928158</a>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <i class="fas fa-envelope text-primary-500 mt-1"></i>
+                            <a href="mailto:info@hotelsol.com" class="text-gray-300 hover:text-white">info@hotelsol.com</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Social Links -->
+                <div>
+                    <h4 class="text-xl font-bold mb-6">Síguenos</h4>
+                    <div class="flex space-x-4">
+                        <a href="https://www.facebook.com/solhotel1/?locale=es_LA" target="_blank" class="text-gray-300 hover:text-white text-xl transition-colors">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-white text-xl transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-white text-xl transition-colors">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
+                    <p class="text-gray-400 text-sm mt-8">
+                        Diseñado con <i class="fas fa-heart text-red-500"></i> para tu comodidad
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

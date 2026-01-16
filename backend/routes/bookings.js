@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
     const [bookings] = await pool.execute(`
       SELECT 
         b.*,
-        r.number as room_number,
+        r.room_number as room_number,
         r.type as room_type,
         r.floor
       FROM bookings b
@@ -144,7 +144,7 @@ router.post('/', async (req, res) => {
     const [booking] = await pool.execute(`
       SELECT 
         b.*,
-        r.number as room_number,
+        r.room_number as room_number,
         r.type as room_type,
         r.floor
       FROM bookings b
@@ -251,6 +251,269 @@ router.patch('/:id/status', async (req, res) => {
     res.status(500).json({ 
       success: false,
       message: 'Error al actualizar el estado de la reserva',
+      error: error.message
+    });
+  }
+});
+
+// Get bookings by date (for today's bookings and checkouts)
+router.get('/by-date/:date', async (req, res) => {
+  try {
+    const { date } = req.params;
+    
+    // Asegurar que la fecha esté en formato YYYY-MM-DD
+    const formattedDate = date.includes('T') ? date.split('T')[0] : date;
+    
+    console.log(`Fetching bookings for date: ${formattedDate}`);
+    
+    const [bookings] = await pool.execute(`
+      SELECT 
+        b.*,
+        r.room_number as room_number,
+        r.type as room_type,
+        r.floor
+      FROM bookings b
+      JOIN rooms r ON b.room_id = r.id
+      WHERE (
+        (b.check_in_date <= ? AND b.check_out_date > ? AND b.status IN ('confirmed', 'checked_in'))
+        OR (DATE(b.check_out_date) = ? AND b.status = 'checked_out')
+      )
+      ORDER BY b.check_in_date ASC
+    `, [formattedDate, formattedDate, formattedDate]);
+
+    console.log(`Found ${bookings.length} bookings for ${formattedDate}`);
+
+    res.json({ 
+      success: true,
+      bookings,
+      date: formattedDate
+    });
+  } catch (error) {
+    console.error('Get bookings by date error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error al obtener las reservas por fecha',
+      error: error.message
+    });
+  }
+});
+
+// Delete booking
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    console.log(`Deleting booking with ID: ${id}`);
+    
+    const [result] = await pool.execute('DELETE FROM bookings WHERE id = ?', [id]);
+    
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Checkout no encontrado'
+      });
+    }
+    
+    console.log(`✅ Checkout eliminado exitosamente (ID: ${id})`);
+    
+    res.json({
+      success: true,
+      message: 'Checkout eliminado exitosamente'
+    });
+  } catch (error) {
+    console.error('Delete booking error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al eliminar el checkout',
+      error: error.message
+    });
+  }
+});
+
+// Company Check-in endpoint
+router.post('/company-checkin', async (req, res) => {
+  try {
+    const { 
+      company_id,
+      company_name,
+      room_id,
+      room_number,
+      guest_name,
+      guest_phone,
+      guest_email,
+      guest_identification,
+      check_in_date,
+      check_out_date,
+      nights,
+      price_per_night,
+      total_amount,
+      notes,
+      payment_type = 'company_contract',
+      status = 'checked_in' // checked_in hasta que se haga el checkout real
+    } = req.body;
+
+    // Validar datos requeridos
+    if (!room_id || !guest_name || !check_in_date || !check_out_date || !price_per_night) {
+      return res.status(400).json({
+        success: false,
+        message: 'Datos incompletos para realizar el check-in (precio requerido)'
+      });
+    }
+
+    // Verificar que la habitación existe y está disponible
+    const [roomCheck] = await pool.execute(
+      'SELECT id, current_status, room_number FROM rooms WHERE id = ?',
+      [room_id]
+    );
+
+    if (roomCheck.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'La habitación no existe'
+      });
+    }
+
+    const room = roomCheck[0];
+
+    // Verificar que la habitación NO está ocupada
+    if (room.current_status === 'occupied') {
+      return res.status(409).json({
+        success: false,
+        message: `La habitación ${room.room_number} está ocupada. No es posible realizar el check-in.`
+      });
+    }
+
+    // Verificar conflictos con reservas existentes
+    const [conflictingBookings] = await pool.execute(`
+      SELECT id, guest_name, check_in_date, check_out_date FROM bookings 
+      WHERE room_id = ? 
+      AND status IN ('confirmed', 'checked_in')
+      AND DATE(check_in_date) < DATE(?)
+      AND DATE(check_out_date) > DATE(?)
+    `, [room_id, check_out_date, check_in_date]);
+
+    if (conflictingBookings.length > 0) {
+      return res.status(409).json({
+        success: false,
+        message: `La habitación ${room.room_number} tiene una reserva conflictiva para esas fechas`
+      });
+    }
+
+    // Insertar nueva reserva con información de empresa
+    const [result] = await pool.execute(`
+      INSERT INTO bookings (
+        room_id,
+        guest_name,
+        guest_email,
+        guest_phone,
+        guest_identification,
+        check_in_date,
+        check_out_date,
+        nights_booked,
+        price_per_night,
+        total_amount,
+        company_id,
+        company_name,
+        payment_type,
+        status,
+        notes,
+        created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+    `, [
+      room_id,
+      guest_name,
+      guest_email || null,
+      guest_phone || null,
+      guest_identification || null,
+      check_in_date,
+      check_out_date,
+      nights,
+      price_per_night,
+      total_amount,
+      company_id,
+      company_name,
+      payment_type,
+      status,
+      notes || null
+    ]);
+
+    // Actualizar estado de la habitación
+    await pool.execute(`
+      UPDATE rooms 
+      SET current_status = 'occupied'
+      WHERE id = ?
+    `, [room_id]);
+
+    console.log(`✅ Check-in empresarial creado: ${guest_name} en habitación ${room_number} (Empresa: ${company_name})`);
+
+    res.status(201).json({
+      success: true,
+      message: 'Check-in empresarial completado exitosamente',
+      booking: {
+        id: result.insertId,
+        room_id,
+        room_number,
+        guest_name,
+        company_name,
+        check_in_date,
+        check_out_date,
+        total_amount,
+        status,
+        payment_type
+      }
+    });
+  } catch (error) {
+    console.error('Company check-in error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al procesar el check-in empresarial',
+      error: error.message
+    });
+  }
+});
+
+// Checkout de una reserva (cambiar status a checked_out)
+router.post('/checkout/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Obtener la reserva actual
+    const [booking] = await pool.execute(
+      'SELECT * FROM bookings WHERE id = ?',
+      [id]
+    );
+    
+    if (!booking || booking.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Reserva no encontrada'
+      });
+    }
+    
+    // Actualizar status a checked_out
+    await pool.execute(
+      'UPDATE bookings SET status = ? WHERE id = ?',
+      ['checked_out', id]
+    );
+    
+    // Actualizar estado de la habitación a disponible
+    await pool.execute(
+      'UPDATE rooms SET current_status = ? WHERE id = ?',
+      ['available', booking[0].room_id]
+    );
+    
+    console.log(`✅ Checkout completado para reserva ID: ${id}`);
+    
+    res.json({
+      success: true,
+      message: 'Checkout completado exitosamente',
+      booking_id: id
+    });
+  } catch (error) {
+    console.error('Checkout error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al procesar el checkout',
       error: error.message
     });
   }

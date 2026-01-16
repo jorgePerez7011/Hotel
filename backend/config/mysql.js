@@ -96,6 +96,113 @@ const initializeTables = async (connection) => {
       )
     `);
 
+    // Shift Reports table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS shift_reports (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        fecha_entrega DATE NOT NULL,
+        turno VARCHAR(50) NOT NULL,
+        recibe VARCHAR(255) NOT NULL,
+        jornada VARCHAR(50) NOT NULL,
+        habitaciones_ocupadas JSON,
+        gaseosas TEXT,
+        agua TEXT,
+        mecatos TEXT,
+        elementos_aseo TEXT,
+        dinero_caja TEXT,
+        mecatos_hidratacion TEXT,
+        compras_turno TEXT,
+        desayunos TEXT,
+        almuerzos TEXT,
+        cenas TEXT,
+        habitaciones_pendientes TEXT,
+        compras_pendientes TEXT,
+        pagos_pendientes TEXT,
+        ingresos TEXT,
+        egresos TEXT,
+        notas TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Companies table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS companies (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        nit VARCHAR(20) NOT NULL UNIQUE COMMENT 'Número de identificación tributaria',
+        name VARCHAR(255) NOT NULL COMMENT 'Nombre de la empresa',
+        description TEXT COMMENT 'Descripción o notas sobre la empresa',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha de creación',
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Fecha de última actualización',
+        INDEX idx_nit (nit),
+        INDEX idx_name (name)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tabla para almacenar información de empresas'
+    `);
+
+    // Invoices table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS invoices (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        invoice_number VARCHAR(50) NOT NULL UNIQUE COMMENT 'Número de factura',
+        booking_id INT COMMENT 'Referencia a la reserva',
+        guest_name VARCHAR(255) NOT NULL COMMENT 'Razón social / Nombre del huésped',
+        guest_identification VARCHAR(50) COMMENT 'NIT o CC del cliente',
+        guest_email VARCHAR(255) COMMENT 'Correo del huésped',
+        guest_address VARCHAR(255) COMMENT 'Dirección del cliente',
+        guest_city VARCHAR(100) COMMENT 'Ciudad del cliente',
+        company_id INT COMMENT 'Referencia a la empresa',
+        invoice_date DATE NOT NULL COMMENT 'Fecha de emisión de la factura',
+        check_in_date DATE COMMENT 'Fecha de entrada',
+        check_out_date DATE COMMENT 'Fecha de salida',
+        room_number VARCHAR(10) COMMENT 'Número de habitación',
+        nights INT COMMENT 'Número de noches',
+        subtotal DECIMAL(10, 2) NOT NULL DEFAULT 0 COMMENT 'Subtotal antes de impuestos',
+        tax DECIMAL(10, 2) NOT NULL DEFAULT 0 COMMENT 'Monto de impuestos/IVA',
+        total DECIMAL(10, 2) NOT NULL COMMENT 'Monto total de la factura',
+        payment_method VARCHAR(50) COMMENT 'Método de pago (efectivo, tarjeta, etc)',
+        status VARCHAR(50) DEFAULT 'emitida' COMMENT 'Estado (emitida, pagada, cancelada)',
+        notes TEXT COMMENT 'Notas adicionales',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha de creación',
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Fecha de última actualización',
+        FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL,
+        FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE SET NULL,
+        INDEX idx_invoice_number (invoice_number),
+        INDEX idx_invoice_date (invoice_date),
+        INDEX idx_status (status)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tabla para almacenar facturas de clientes'
+    `);
+
+    // Migración: Agregar columnas faltantes si no existen
+    try {
+      const columnsToAdd = [
+        { name: 'guest_identification', definition: "VARCHAR(50) COMMENT 'NIT o CC del cliente'" },
+        { name: 'guest_phone', definition: "VARCHAR(20) COMMENT 'Teléfono del cliente'" },
+        { name: 'guest_address', definition: "VARCHAR(255) COMMENT 'Dirección del cliente'" },
+        { name: 'guest_city', definition: "VARCHAR(100) COMMENT 'Ciudad del cliente'" }
+      ];
+
+      for (const column of columnsToAdd) {
+        try {
+          await connection.execute(`ALTER TABLE invoices ADD COLUMN ${column.name} ${column.definition}`);
+          console.log(`✅ Columna '${column.name}' agregada a la tabla 'invoices'`);
+        } catch (error) {
+          // Si la columna ya existe, ignorar el error
+          if (error.code !== 'ER_DUP_FIELDNAME') {
+            console.warn(`⚠️ No se pudo agregar columna '${column.name}':`, error.message);
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Error durante migración de columnas:', error.message);
+    }
+
+    // Insert sample companies if the table is empty
+    const [companyRows] = await connection.execute('SELECT COUNT(*) as count FROM companies');
+    if (companyRows[0].count === 0) {
+      await insertSampleCompanies(connection);
+    }
+
     // Insert sample rooms if the table is empty
     const [rows] = await connection.execute('SELECT COUNT(*) as count FROM rooms');
     if (rows[0].count === 0) {
@@ -139,6 +246,30 @@ const insertSampleRooms = async (connection) => {
   }
 };
 
+// Insert sample companies for demonstration
+const insertSampleCompanies = async (connection) => {
+  try {
+    const sampleCompanies = [
+      ['800000000-0', 'SERINCO DRILLING', 'Empresa de perforación'],
+      ['800000001-1', 'ERAZO VALENCIA', 'Asesoría y consultoría'],
+      ['800000002-2', 'GRANTIERRA', 'Empresa agrícola'],
+      ['800000003-3', 'AMBIENCIQ', 'Gestión ambiental'],
+      ['800000004-4', 'BUREAU VERITAS', 'Auditoría y certificación']
+    ];
+
+    for (const company of sampleCompanies) {
+      await connection.execute(
+        'INSERT INTO companies (nit, name, description) VALUES (?, ?, ?)',
+        company
+      );
+    }
+
+    console.log('Sample companies inserted successfully');
+  } catch (error) {
+    console.error('Error inserting sample companies:', error.message);
+  }
+};
+
 // Insert sample employees for demonstration (with plain text passwords for demo)
 const insertSampleEmployees = async (connection) => {
   try {
@@ -165,3 +296,8 @@ const insertSampleEmployees = async (connection) => {
 
 // Export the pool for use in other modules
 export default pool;
+
+// Function to get a connection from the pool
+export const getMySQLConnection = async () => {
+  return await pool.getConnection();
+};

@@ -5,16 +5,66 @@ dotenv.config();
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/hotel_management';
 
+// Variable para rastrear el estado de la conexión
+let isMongoConnected = false;
+
 export const connectMongoDB = async () => {
   try {
-    await mongoose.connect(MONGODB_URI);
+    // Configurar opciones de conexión con timeouts más cortos
+    const options = {
+      serverSelectionTimeoutMS: 5000, // 5 segundos en lugar de 30
+      connectTimeoutMS: 5000,
+      socketTimeoutMS: 5000,
+      maxPoolSize: 10,
+      bufferCommands: false, // Disable mongoose buffering
+      bufferMaxEntries: 0 // Disable mongoose buffering
+    };
+    
+    await mongoose.connect(MONGODB_URI, options);
+    isMongoConnected = true;
     console.log('MongoDB connected successfully');
     return true;
   } catch (error) {
+    isMongoConnected = false;
     console.error('MongoDB connection error:', error.message);
-    throw error;
+    console.log('MongoDB will not be used, falling back to MySQL only');
+    return false;
   }
 };
+
+// Función para verificar si MongoDB está conectado
+export const isMongoDBConnected = () => {
+  return isMongoConnected && mongoose.connection.readyState === 1;
+};
+
+// Función para cerrar la conexión de MongoDB
+export const disconnectMongoDB = async () => {
+  try {
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.disconnect();
+      isMongoConnected = false;
+      console.log('MongoDB disconnected successfully');
+    }
+  } catch (error) {
+    console.error('Error disconnecting from MongoDB:', error.message);
+  }
+};
+
+// Manejar eventos de conexión
+mongoose.connection.on('connected', () => {
+  console.log('Mongoose connected to MongoDB');
+  isMongoConnected = true;
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('Mongoose connection error:', err);
+  isMongoConnected = false;
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('Mongoose disconnected from MongoDB');
+  isMongoConnected = false;
+});
 
 // User Schema
 const userSchema = new mongoose.Schema({

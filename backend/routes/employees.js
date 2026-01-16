@@ -1,8 +1,27 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import pool from '../config/mysql.js';
 
 const router = express.Router();
+
+// Middleware to authenticate JWT token
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Token de acceso requerido' });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET || 'hotel-sol-secret-key-2025', (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: 'Token inválido o expirado' });
+    }
+    req.user = user;
+    next();
+  });
+}
 
 // Get all employees
 router.get('/', async (req, res) => {
@@ -81,8 +100,8 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Create new employee
-router.post('/', async (req, res) => {
+// Create new employee - REQUIRES AUTHENTICATION
+router.post('/', authenticateToken, async (req, res) => {
   try {
     const { 
       name, 
@@ -115,13 +134,6 @@ router.post('/', async (req, res) => {
     if (password.length < 6) {
       return res.status(400).json({ 
         error: 'Password must be at least 6 characters long' 
-      });
-    }
-
-    // Validate email domain
-    if (!email.includes('@hotelsol.com')) {
-      return res.status(400).json({ 
-        error: 'Email must be from @hotelsol.com domain' 
       });
     }
 
@@ -199,6 +211,11 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Employee not found' });
     }
 
+    // Convert undefined to null for SQL parameters
+    const params = [name, email, phone, position, salary, shift, emergency_contact, address, is_active].map(
+      value => value === undefined ? null : value
+    );
+
     // Update employee
     const [result] = await pool.execute(`
       UPDATE employees 
@@ -212,7 +229,7 @@ router.put('/:id', async (req, res) => {
           address = COALESCE(?, address),
           is_active = COALESCE(?, is_active)
       WHERE id = ?
-    `, [name, email, phone, position, salary, shift, emergency_contact, address, is_active, id]);
+    `, [...params, id]);
 
     // Get the updated employee
     const [updatedEmployee] = await pool.execute(
@@ -234,7 +251,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// Delete employee (soft delete - set is_active to false)
+// Delete employee (hard delete)
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -249,14 +266,14 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Employee not found' });
     }
 
-    // Soft delete (deactivate) employee
+    // Hard delete employee
     await pool.execute(
-      'UPDATE employees SET is_active = false WHERE id = ?',
+      'DELETE FROM employees WHERE id = ?',
       [id]
     );
 
     res.json({
-      message: 'Employee deactivated successfully',
+      message: 'Employee deleted successfully',
       employee_id: id
     });
 

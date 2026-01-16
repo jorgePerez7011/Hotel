@@ -1,13 +1,31 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { User } from '../config/mongodb.js';
+import { User, isMongoDBConnected } from '../config/mongodb.js';
 import pool from '../config/mysql.js';
 
 const router = express.Router();
 
-// Register endpoint
-router.post('/register', async (req, res) => {
+// Middleware to authenticate JWT token
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Token de acceso requerido' });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET || 'hotel-sol-secret-key-2025', (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: 'Token inválido o expirado' });
+    }
+    req.user = user;
+    next();
+  });
+}
+
+// Register endpoint - REQUIRES AUTHENTICATION
+router.post('/register', authenticateToken, async (req, res) => {
   try {
     const { email, password, name, role = 'guest' } = req.body;
 
@@ -23,25 +41,35 @@ router.post('/register', async (req, res) => {
 
     let user;
     
-    // Try MongoDB first, then PostgreSQL
-    try {
-      // Check if user already exists in MongoDB
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-        return res.status(409).json({ error: 'User already exists' });
-      }
+    // Try MongoDB first (only if connected), then MySQL
+    if (isMongoDBConnected()) {
+      try {
+        // Check if user already exists in MongoDB
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+          return res.status(409).json({ error: 'User already exists' });
+        }
 
-      // Create user in MongoDB
-      user = new User({
-        email,
-        password: hashedPassword,
-        name,
-        role
-      });
-      await user.save();
-      
-    } catch (mongoError) {
-      // Fallback to MySQL
+        // Create user in MongoDB
+        user = new User({
+          email,
+          password: hashedPassword,
+          name,
+          role
+        });
+        await user.save();
+        
+        console.log('User registered successfully in MongoDB');
+      } catch (mongoError) {
+        console.log('MongoDB registration failed, falling back to MySQL:', mongoError.message);
+        // Fallback to MySQL
+      }
+    } else {
+      console.log('MongoDB not connected, using MySQL for registration');
+    }
+    
+    // If MongoDB wasn't used or failed, use MySQL
+    if (!user || !user._id) {
       try {
         // Check if user already exists in MySQL
         const [existingUsers] = await pool.execute(
@@ -143,8 +171,8 @@ router.post('/login', async (req, res) => {
       }
     }
 
-    // If still no user found, try MongoDB as fallback
-    if (!user) {
+    // If still no user found, try MongoDB as fallback (only if connected)
+    if (!user && isMongoDBConnected()) {
       try {
         user = await User.findOne({ email });
         if (user) {
@@ -246,24 +274,6 @@ router.get('/profile', authenticateToken, async (req, res) => {
     });
   }
 });
-
-// Middleware to authenticate JWT token
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ error: 'Token de acceso requerido' });
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET || 'hotel-sol-secret-key-2025', (err, user) => {
-    if (err) {
-      return res.status(403).json({ error: 'Token inválido o expirado' });
-    }
-    req.user = user;
-    next();
-  });
-}
 
 // Verify token endpoint
 router.get('/verify', authenticateToken, (req, res) => {

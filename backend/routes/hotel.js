@@ -10,48 +10,71 @@ router.get('/rooms', async (req, res) => {
     const [rooms] = await pool.execute(`
       SELECT 
         r.id,
-        r.room_number as number,
+        r.room_number,
         r.type,
         r.capacity,
         r.base_price,
         r.price_per_night,
         r.floor,
         r.description,
-        COALESCE(r.current_status, 'available') as current_status,
+        r.current_status,
         r.is_available,
         r.created_at,
         b.id as booking_id,
         b.guest_name,
         b.guest_email,
         b.guest_phone,
+        b.guest_identification,
         b.check_in_date,
         b.check_out_date,
         b.total_amount,
+        b.price_per_night as booking_price,
         b.status as booking_status,
-        b.nights_booked
+        b.nights_booked,
+        b.company_id,
+        b.company_name,
+        b.payment_type
       FROM rooms r
       LEFT JOIN bookings b ON r.id = b.room_id 
-        AND b.status IN ('confirmed', 'checked_in') 
-        AND b.check_in_date <= CURDATE() + INTERVAL 30 DAY
-        AND b.check_out_date > CURDATE()
+        AND b.status IN ('pending', 'confirmed', 'checked_in')
+        AND DATE(b.check_in_date) <= DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+        AND DATE(b.check_out_date) >= CURDATE()
       ORDER BY r.room_number ASC
     `);
 
+    // Asegurar que current_status está siempre definido
+    const processedRooms = rooms.map(room => ({
+      ...room,
+      current_status: room.current_status || 'available'
+    }));
+
+    console.log('📊 Habitaciones cargadas:', processedRooms.map(r => ({ 
+      number: r.room_number, 
+      status: r.current_status,
+      guest: r.guest_name || 'N/A',
+      checkIn: r.check_in_date ? new Date(r.check_in_date).toLocaleDateString('es-ES') : 'N/A'
+    })));
+
+    const summary = {
+      total: processedRooms.length,
+      available: processedRooms.filter(r => r.current_status === 'available').length,
+      occupied: processedRooms.filter(r => r.current_status === 'occupied').length,
+      reserved: processedRooms.filter(r => r.current_status === 'reserved').length,
+      maintenance: processedRooms.filter(r => r.current_status === 'maintenance').length,
+      cleaning: processedRooms.filter(r => r.current_status === 'cleaning').length
+    };
+
+    console.log('📈 Resumen de estados:', summary);
+
     res.json({ 
       success: true,
-      rooms,
-      summary: {
-        total: rooms.length,
-        available: rooms.filter(r => r.current_status === 'available').length,
-        occupied: rooms.filter(r => r.current_status === 'occupied').length,
-        reserved: rooms.filter(r => r.current_status === 'reserved').length,
-        maintenance: rooms.filter(r => r.current_status === 'maintenance').length,
-        cleaning: rooms.filter(r => r.current_status === 'cleaning').length
-      }
+      rooms: processedRooms,
+      summary
     });
   } catch (error) {
-    console.error('Error fetching rooms:', error);
+    console.error('❌ Error fetching rooms:', error);
     res.status(500).json({ 
+      success: false,
       error: 'Failed to fetch rooms',
       message: error.message
     });
@@ -283,11 +306,11 @@ router.get('/rooms/stats', async (req, res) => {
 router.post('/rooms/:id/checkin', async (req, res) => {
   try {
     const { id } = req.params;
-    const { checkin_time, guest_info } = req.body;
+    const { checkin_time, guest_info, price_per_night } = req.body;
 
     // Verificar que la habitación existe
     const [room] = await pool.execute(`
-      SELECT id, room_number, current_status, price_per_night 
+      SELECT id, room_number, current_status, price_per_night as db_price
       FROM rooms 
       WHERE id = ?
     `, [id]);
@@ -296,56 +319,79 @@ router.post('/rooms/:id/checkin', async (req, res) => {
       return res.status(404).json({ error: 'Room not found' });
     }
 
-    // Permitir check-in para habitaciones reservadas O disponibles
-    if (room[0].current_status !== 'reserved' && room[0].current_status !== 'available') {
+    // Permitir check-in para habitaciones disponibles, reservadas u ocupadas
+    const allowedStatuses = ['available', 'reserved', 'occupied'];
+    if (!allowedStatuses.includes(room[0].current_status)) {
       return res.status(400).json({ 
-        error: `Cannot check-in room ${room[0].room_number}. Current status: ${room[0].current_status}` 
+        error: `Cannot check-in room ${room[0].room_number}. Current status: ${room[0].current_status}. Allowed: ${allowedStatuses.join(', ')}` 
       });
     }
+
+    // El precio viene en COP desde el frontend
+    // Asegurar que finalPrice sea numérico
+    const finalPrice = parseInt(price_per_night || room[0].db_price || 0);
+    
+    console.log(`💰 Check-in Habitación ${room[0].room_number}: Precio = ${finalPrice}`);
 
     // Actualizar el estado de la habitación a ocupada
     await pool.execute(`
       UPDATE rooms 
       SET current_status = 'occupied', 
-          is_available = false 
+          is_available = false,
+          price_per_night = ?
       WHERE id = ?
-    `, [id]);
+    `, [finalPrice, id]);
 
     // Si es una habitación disponible (walk-in), crear una nueva reserva
-    if (room[0].current_status === 'available' && guest_info) {
+    // Si es reservada, actualizar la reserva existente
+    if (guest_info || room[0].current_status === 'reserved') {
       const checkInDate = new Date();
       const checkOutDate = new Date(checkInDate);
-      checkOutDate.setDate(checkOutDate.getDate() + (guest_info.nights || 1));
+      const nights = guest_info?.nights || 1;
+      checkOutDate.setDate(checkOutDate.getDate() + nights);
+      
+      // Calcular total_amount correctamente: precio × noches
+      const totalAmount = finalPrice * nights;
+      
+      console.log(`📝 Booking: ${nights} noches × ${finalPrice} = ${totalAmount}`);
 
-      await pool.execute(`
-        INSERT INTO bookings 
-        (room_id, guest_name, guest_email, guest_phone, check_in_date, check_out_date, 
-         total_amount, status, nights_booked, price_per_night, notes, actual_checkin_time)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'checked_in', ?, ?, ?, ?)
-      `, [
-        id,
-        guest_info.name || 'Walk-in Guest',
-        guest_info.email || '',
-        guest_info.phone || '',
-        checkInDate.toISOString().split('T')[0],
-        checkOutDate.toISOString().split('T')[0],
-        (guest_info.nights || 1) * room[0].price_per_night,
-        guest_info.nights || 1,
-        room[0].price_per_night,
-        guest_info.notes || 'Walk-in guest - Check-in directo',
-        checkin_time || new Date().toISOString()
-      ]);
-    } else {
-      // Si es una habitación reservada, actualizar la reserva existente
-      await pool.execute(`
-        UPDATE bookings 
-        SET status = 'checked_in', 
-            actual_checkin_time = ? 
-        WHERE room_id = ? AND status = 'confirmed'
-      `, [checkin_time || new Date().toISOString(), id]);
+      // Si es reservada, actualizar el booking existente
+      if (room[0].current_status === 'reserved') {
+        await pool.execute(`
+          UPDATE bookings 
+          SET status = 'checked_in', 
+              actual_checkin_time = ?
+          WHERE room_id = ? 
+          AND status IN ('pending', 'confirmed')
+          LIMIT 1
+        `, [
+          checkin_time || new Date().toISOString(),
+          id
+        ]);
+      } else {
+        // Si es disponible, crear nuevo booking (walk-in)
+        await pool.execute(`
+          INSERT INTO bookings 
+          (room_id, guest_name, guest_email, guest_phone, check_in_date, check_out_date, 
+           total_amount, status, nights_booked, price_per_night, notes, actual_checkin_time)
+          VALUES (?, ?, ?, ?, ?, ?, ?, 'checked_in', ?, ?, ?, ?)
+        `, [
+          id,
+          guest_info.name || 'Walk-in Guest',
+          guest_info.email || '',
+          guest_info.phone || '',
+          checkInDate.toISOString().split('T')[0],
+          checkOutDate.toISOString().split('T')[0],
+          totalAmount,
+          nights,
+          finalPrice,
+          guest_info.notes || 'Walk-in guest - Check-in directo',
+          checkin_time || new Date().toISOString()
+        ]);
+      }
     }
 
-    console.log(`✅ Check-in realizado para habitación ${room[0].room_number}`);
+    console.log(`✅ Check-in: Habitación ${room[0].room_number} → ocupada`);
 
     res.json({
       success: true,
@@ -355,9 +401,9 @@ router.post('/rooms/:id/checkin', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error during check-in:', error);
-    res.status(500).json({ 
-      error: 'Failed to perform check-in',
+    console.error('❌ Error during check-in:', error);
+    res.status(500).json({
+      error: 'Check-in failed',
       message: error.message
     });
   }
@@ -394,13 +440,19 @@ router.post('/rooms/:id/checkout', async (req, res) => {
       WHERE id = ?
     `, [id]);
 
-    // Actualizar la reserva para marcar el check-out
+    // Obtener la fecha y hora actual
+    const now = new Date();
+    const checkoutDateTime = checkout_time || now.toISOString();
+    const checkoutDate = checkoutDateTime.split('T')[0]; // Fecha en formato YYYY-MM-DD
+
+    // Actualizar la reserva para marcar el check-out y actualizar la fecha
     await pool.execute(`
       UPDATE bookings 
       SET status = 'checked_out', 
+          check_out_date = ?,
           actual_checkout_time = ? 
       WHERE room_id = ? AND status = 'checked_in'
-    `, [checkout_time || new Date().toISOString(), id]);
+    `, [checkoutDate, checkoutDateTime, id]);
 
     console.log(`✅ Check-out realizado para habitación ${room[0].room_number}`);
 
@@ -408,7 +460,7 @@ router.post('/rooms/:id/checkout', async (req, res) => {
       success: true,
       message: `Check-out successful for room ${room[0].room_number}`,
       room_id: id,
-      checkout_time: checkout_time || new Date().toISOString()
+      checkout_time: checkoutDateTime
     });
 
   } catch (error) {
@@ -609,7 +661,7 @@ router.post('/booking-request', async (req, res) => {
     console.log('=======================================\n');
 
     if (emailResult && emailResult.success) {
-      console.log('📧 ¡Email enviado exitosamente a kokocardenas7011@gmail.com!');
+      console.log('📧 ¡Email enviado exitosamente a solhotel.recepcion@gmail.com!');
       
       res.json({
         success: true,
@@ -633,6 +685,47 @@ router.post('/booking-request', async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: 'Error interno del servidor. Por favor, intenta nuevamente.' 
+    });
+  }
+});
+
+// Endpoint de diagnóstico - Ver estado real de la BD
+router.get('/debug/rooms-status', async (req, res) => {
+  try {
+    const [rooms] = await pool.execute(`
+      SELECT 
+        r.id,
+        r.room_number,
+        r.current_status,
+        r.is_available,
+        COUNT(DISTINCT CASE 
+          WHEN b.status IN ('confirmed', 'checked_in') 
+          AND b.check_in_date <= CURDATE() 
+          AND b.check_out_date >= CURDATE() 
+          THEN b.id 
+        END) as active_bookings,
+        MAX(CASE 
+          WHEN b.status IN ('confirmed', 'checked_in') 
+          AND b.check_in_date <= CURDATE() 
+          AND b.check_out_date >= CURDATE() 
+          THEN b.guest_name 
+        END) as current_guest
+      FROM rooms r
+      LEFT JOIN bookings b ON r.id = b.room_id
+      GROUP BY r.id, r.room_number, r.current_status, r.is_available
+      ORDER BY r.room_number ASC
+    `);
+
+    res.json({
+      success: true,
+      debug_data: rooms,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error en diagnóstico:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
     });
   }
 });
