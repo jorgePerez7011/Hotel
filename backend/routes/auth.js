@@ -283,6 +283,27 @@ router.get('/verify', authenticateToken, (req, res) => {
   });
 });
 
+// Debug endpoint to check users in database
+router.get('/debug/users', async (req, res) => {
+  try {
+    const [users] = await pool.execute('SELECT id, email, name, role FROM users LIMIT 10');
+    const [employees] = await pool.execute('SELECT id, email, name, position FROM employees LIMIT 10');
+    
+    res.json({
+      status: 'success',
+      users_table: users,
+      employees_table: employees,
+      total_users: users.length,
+      total_employees: employees.length
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: error.message
+    });
+  }
+});
+
 // Logout endpoint
 router.post('/logout', (req, res) => {
   res.json({

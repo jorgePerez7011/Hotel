@@ -89,6 +89,34 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Debug database endpoint
+app.get('/api/debug/db', async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    
+    // Test query
+    const [users] = await connection.execute('SELECT COUNT(*) as count FROM users');
+    const [employees] = await connection.execute('SELECT COUNT(*) as count FROM employees');
+    
+    connection.release();
+    
+    res.json({
+      status: 'Conectado',
+      database: process.env.DB_NAME,
+      host: process.env.DB_HOST,
+      users_count: users[0].count,
+      employees_count: employees[0].count
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'Error',
+      error: error.message,
+      database: process.env.DB_NAME,
+      host: process.env.DB_HOST
+    });
+  }
+});
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/hotel', hotelRoutes);
