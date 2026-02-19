@@ -184,7 +184,20 @@ router.post('/login', async (req, res) => {
     }
 
     if (!user) {
-      return res.status(401).json({ error: 'Credenciales incorrectas' });
+      // Demo users for testing
+      const demoUsers = [
+        { id: 1, email: 'admin@solhotel.co', password: 'admin123', name: 'Administrador', role: 'admin', userType: 'demo' },
+        { id: 2, email: 'maria.gonzalez@solhotel.co', password: 'maria123', name: 'María González', role: 'recepcionista', userType: 'demo' },
+        { id: 3, email: 'ana.martinez@solhotel.co', password: 'ana123', name: 'Ana Martínez', role: 'aseadora', userType: 'demo' }
+      ];
+
+      const demoUser = demoUsers.find(u => u.email === email && u.password === password);
+      
+      if (demoUser) {
+        user = demoUser;
+      } else {
+        return res.status(401).json({ error: 'Credenciales incorrectas' });
+      }
     }
 
     // For demo purposes, also allow plain text password comparison
