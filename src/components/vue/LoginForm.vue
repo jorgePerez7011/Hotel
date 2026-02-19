@@ -102,6 +102,20 @@
 
      
 
+        <!-- Registration Link -->
+        <div class="mt-6 pt-6 border-t border-gray-300">
+          <p class="text-center text-gray-600 text-sm mb-3">
+            ¿No tienes cuenta?
+          </p>
+          <button 
+            @click="goToRegister"
+            class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-all duration-300"
+          >
+            <i class="fas fa-user-plus mr-2"></i>
+            Crear Nueva Cuenta
+          </button>
+        </div>
+
         <!-- Navigation Links -->
         <div class="mt-4 text-center space-y-2">
           <button 
@@ -227,6 +241,10 @@ const handleLogin = async () => {
 
 const goToHome = () => {
   window.location.href = '/';
+};
+
+const goToRegister = () => {
+  window.location.href = '/register';
 };
 </script>
 
