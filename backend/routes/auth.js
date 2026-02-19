@@ -130,6 +130,7 @@ router.post('/register', authenticateToken, async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log('Login attempt:', { email, password });
 
     if (!email || !password) {
       return res.status(400).json({ 
@@ -185,6 +186,7 @@ router.post('/login', async (req, res) => {
 
     if (!user) {
       // Demo users for testing
+      console.log('No user found in database, trying demo users');
       const demoUsers = [
         { id: 1, email: 'admin@solhotel.co', password: 'admin123', name: 'Administrador', role: 'admin', userType: 'demo' },
         { id: 2, email: 'maria.gonzalez@solhotel.co', password: 'maria123', name: 'María González', role: 'recepcionista', userType: 'demo' },
@@ -192,10 +194,12 @@ router.post('/login', async (req, res) => {
       ];
 
       const demoUser = demoUsers.find(u => u.email === email && u.password === password);
+      console.log('Demo user found:', demoUser ? 'Yes' : 'No');
       
       if (demoUser) {
         user = demoUser;
       } else {
+        console.log('Demo user not found. Available demo users:', demoUsers.map(u => u.email));
         return res.status(401).json({ error: 'Credenciales incorrectas' });
       }
     }
