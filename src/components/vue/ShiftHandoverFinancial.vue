@@ -741,7 +741,7 @@ export default {
       loading.value = true
       try {
         const today = new Date().toISOString().split('T')[0]
-        const response = await fetch(`http://localhost:4000/api/handovers/date/${today}`)
+        const response = await fetch(`/api/handovers/date/${today}`)
         const data = await response.json()
         
         if (data.handovers) {
@@ -891,7 +891,7 @@ export default {
       // Cargar la última entrega para obtener las habitaciones ocupadas
       try {
         const today = new Date().toISOString().split('T')[0]
-        const response = await fetch(`http://localhost:4000/api/handovers/date/${today}`)
+        const response = await fetch(`/api/handovers/date/${today}`)
         const data = await response.json()
         
         if (data.handovers && data.handovers.length > 0) {
@@ -955,7 +955,7 @@ export default {
 
     const downloadPDF = async (id) => {
       try {
-        const response = await fetch(`http://localhost:4000/api/handovers/${id}/pdf`)
+        const response = await fetch(`/api/handovers/${id}/pdf`)
         
         if (response.ok) {
           const blob = await response.blob()
@@ -979,7 +979,7 @@ export default {
 
     const completeHandover = async (handover) => {
       try {
-        const response = await fetch(`http://localhost:4000/api/handovers/${handover.id}/complete`, {
+        const response = await fetch(`/api/handovers/${handover.id}/complete`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json'

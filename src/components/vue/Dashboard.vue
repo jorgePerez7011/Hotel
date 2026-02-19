@@ -1759,7 +1759,7 @@ watch([() => incomeSelectedDate.value, () => incomeSelectedWeek.value, () => inc
 const loadTodaysBookings = async () => {
   try {
     const today = new Date().toISOString().split('T')[0];
-    const response = await fetch(`http://localhost:4000/api/bookings/by-date/${today}`);
+    const response = await fetch(`/api/bookings/by-date/${today}`);
     const data = await response.json();
     
     if (data.success && data.bookings) {
@@ -2163,7 +2163,7 @@ const performWalkInCheckin = async () => {
     const roomId = selectedRoom.value.id;
     const price = parseInt(selectedRoom.value.price_per_night);
     
-    const response = await fetch(`http://localhost:4000/api/hotel/rooms/${roomId}/checkin`, {
+    const response = await fetch(`/api/hotel/rooms/${roomId}/checkin`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -2585,7 +2585,7 @@ const confirmCheckIn = async () => {
       };
     }
 
-    const response = await fetch(`http://localhost:4000/api/hotel/rooms/${roomId}/checkin`, {
+    const response = await fetch(`/api/hotel/rooms/${roomId}/checkin`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

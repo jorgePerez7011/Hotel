@@ -182,7 +182,7 @@ const loadAvailableRooms = async () => {
         checkOut: searchCriteria.value.checkOut
       });
       
-      const response = await fetch(`http://localhost:4000/api/hotel/rooms/available?${params}`);
+      const response = await fetch(`/api/hotel/rooms/available?${params}`);
       if (response.ok) {
         const data = await response.json();
         // Filter only available rooms

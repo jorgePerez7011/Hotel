@@ -380,7 +380,7 @@ const loadHandovers = async () => {
   try {
     loading.value = true;
     const today = new Date().toISOString().split('T')[0];
-    const response = await fetch(`http://localhost:4000/api/handovers/date/${today}`);
+    const response = await fetch(`/api/handovers/date/${today}`);
     
     if (response.ok) {
       const data = await response.json();
@@ -440,7 +440,7 @@ const completeHandover = async (handover: any) => {
   if (!signature) return;
 
   try {
-    const response = await fetch(`http://localhost:4000/api/handovers/${handover.id}/complete`, {
+    const response = await fetch(`/api/handovers/${handover.id}/complete`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'

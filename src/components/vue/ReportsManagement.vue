@@ -782,7 +782,7 @@ export default {
           
           while (current <= new Date(this.endDate)) {
             const dateStr = current.toISOString().split('T')[0];
-            const response = await fetch(`http://localhost:4000/api/bookings/by-date/${dateStr}`);
+            const response = await fetch(`/api/bookings/by-date/${dateStr}`);
             
             if (response.ok) {
               const data = await response.json();
@@ -797,7 +797,7 @@ export default {
           this.checkoutsList = allCheckouts;
         } else {
           // Un día específico
-          const response = await fetch(`http://localhost:4000/api/bookings/by-date/${this.filterDate}`);
+          const response = await fetch(`/api/bookings/by-date/${this.filterDate}`);
           if (response.ok) {
             const data = await response.json();
             console.log('Checkouts loaded:', data);

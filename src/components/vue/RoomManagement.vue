@@ -1149,7 +1149,7 @@ export default {
 
     const changeRoomStatus = async (roomId, newStatus) => {
       try {
-        const response = await fetch(`http://localhost:4000/api/hotel/rooms/${roomId}/status`, {
+        const response = await fetch(`/api/hotel/rooms/${roomId}/status`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json'
@@ -1217,7 +1217,7 @@ export default {
       if (!room) return
 
       try {
-        const response = await fetch(`http://localhost:4000/api/hotel/rooms/${room.id}/checkin`, {
+        const response = await fetch(`/api/hotel/rooms/${room.id}/checkin`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -1284,7 +1284,7 @@ export default {
       if (!room) return
 
       try {
-        const response = await fetch(`http://localhost:4000/api/hotel/rooms/${room.id}/checkout`, {
+        const response = await fetch(`/api/hotel/rooms/${room.id}/checkout`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -1382,7 +1382,7 @@ export default {
         nextInvoiceNumber.value++
 
         // Luego realizar el checkout
-        const checkoutResponse = await fetch(`http://localhost:4000/api/hotel/rooms/${room.id}/checkout`, {
+        const checkoutResponse = await fetch(`/api/hotel/rooms/${room.id}/checkout`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
