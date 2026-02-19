@@ -208,17 +208,32 @@ router.post('/login', async (req, res) => {
     // For demo purposes, also allow plain text password comparison
     let isValidPassword = false;
     
-    // Try bcrypt first
-    try {
-      isValidPassword = await bcrypt.compare(password, user.password);
-    } catch (bcryptError) {
-      // Fallback to plain text comparison for demo users
+    console.log('User found:', user.email, 'Type:', user.userType || 'database');
+    console.log('Password stored:', user.password?.substring(0, 20) + '...', 'Password provided:', password);
+    
+    // If it's a demo user, compare directly
+    if (user.userType === 'demo') {
       isValidPassword = password === user.password;
+      console.log('Demo user password match:', isValidPassword);
+    } else {
+      // Try bcrypt first for database users
+      try {
+        isValidPassword = await bcrypt.compare(password, user.password);
+        console.log('Bcrypt password match:', isValidPassword);
+      } catch (bcryptError) {
+        console.log('Bcrypt error:', bcryptError.message, '- trying plain text comparison');
+        // Fallback to plain text comparison for demo users or improperly hashed passwords
+        isValidPassword = password === user.password;
+        console.log('Plain text password match:', isValidPassword);
+      }
     }
     
     if (!isValidPassword) {
+      console.log('Password validation failed for user:', email);
       return res.status(401).json({ error: 'Credenciales incorrectas' });
     }
+    
+    console.log('Login successful for user:', email);
 
     // Generate JWT token
     const tokenPayload = {
