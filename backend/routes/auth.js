@@ -190,7 +190,8 @@ router.post('/login', async (req, res) => {
       const demoUsers = [
         { id: 1, email: 'admin@solhotel.co', password: 'admin123', name: 'Administrador', role: 'admin', userType: 'demo' },
         { id: 2, email: 'maria.gonzalez@solhotel.co', password: 'maria123', name: 'María González', role: 'recepcionista', userType: 'demo' },
-        { id: 3, email: 'ana.martinez@solhotel.co', password: 'ana123', name: 'Ana Martínez', role: 'aseadora', userType: 'demo' }
+        { id: 3, email: 'ana.martinez@solhotel.co', password: 'ana123', name: 'Ana Martínez', role: 'aseadora', userType: 'demo' },
+        { id: 4, email: 'carmen.lopez@hotelsol.com', password: 'carmen123', name: 'Carmen López', role: 'admin', userType: 'demo' }
       ];
 
       const demoUser = demoUsers.find(u => u.email === email && u.password === password);
