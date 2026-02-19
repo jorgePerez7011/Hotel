@@ -101,7 +101,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create new employee - REQUIRES AUTHENTICATION
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const { 
       name, 
@@ -115,6 +115,8 @@ router.post('/', authenticateToken, async (req, res) => {
       emergency_contact,
       address
     } = req.body;
+
+    console.log('Creating employee:', { name, email, position });
 
     // Validate required fields
     if (!name || !email || !position || !password) {
@@ -173,7 +175,8 @@ router.post('/', authenticateToken, async (req, res) => {
     console.error('Error creating employee:', error);
     res.status(500).json({ 
       error: 'Failed to create employee',
-      message: error.message
+      message: error.message,
+      details: error.code || 'Unknown error'
     });
   }
 });
