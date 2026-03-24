@@ -21,9 +21,16 @@
           </div>
           
           <!-- Contact Info -->
-          <div class="flex items-center space-x-2">
-            <i class="fas fa-phone text-primary-600"></i>
-            <a href="tel:+573001234567" class="text-gray-600 hover:text-primary-600">+57 317 6388290 - 323 3928158</a>
+          <div class="flex items-center space-x-4">
+            <a href="https://wa.me/573176388290" target="_blank" class="text-gray-600 hover:text-primary-600 flex items-center space-x-1">
+              <i class="fab fa-whatsapp text-primary-600"></i>
+              <span>317 6388290</span>
+            </a>
+            <span class="text-gray-400">-</span>
+            <a href="tel:+573233928158" class="text-gray-600 hover:text-primary-600 flex items-center space-x-1">
+              <i class="fas fa-phone text-primary-600"></i>
+              <span>323 3928158</span>
+            </a>
           </div>
         </div>
       </div>
@@ -144,7 +151,7 @@
                 <input 
                   v-model="bookingForm.phone"
                   type="tel" 
-                  placeholder="+57 317 6388290 - 323 3928158"
+                  placeholder=\"317 6388290 - 323 3928158\"
                   class="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   required
                 />
@@ -450,9 +457,16 @@
                 <i class="fas fa-map-marker-alt text-primary-500 mt-1"></i>
                 <span class="text-gray-300">Cl. 19 #8-56, San Martín, Cesar</span>
               </div>
-              <div class="flex items-center space-x-3">
-                <i class="fas fa-phone text-primary-500"></i>
-                <a href="tel:+573001234567" class="text-gray-300 hover:text-white">+57 317 6388290 - 323 3928158</a>
+              <div class="flex items-center space-x-3 flex-wrap gap-2">
+                <a href="https://wa.me/573176388290" target="_blank" class="text-gray-300 hover:text-white flex items-center space-x-1">
+                  <i class="fab fa-whatsapp text-primary-400"></i>
+                  <span>317 6388290</span>
+                </a>
+                <span class="text-gray-500">-</span>
+                <a href="tel:+573233928158" class="text-gray-300 hover:text-white flex items-center space-x-1">
+                  <i class="fas fa-phone text-primary-400"></i>
+                  <span>323 3928158</span>
+                </a>
               </div>
               <div class="flex items-center space-x-3">
                 <i class="fas fa-envelope text-primary-500"></i>
