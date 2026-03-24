@@ -61,7 +61,7 @@
             Servicios
           </a>
           <a 
-            href="/admin/dashboard"
+            href="/login"
             class="text-white hover:text-blue-300 transition-colors font-medium px-3 py-2 rounded"
           >
             Panel Admin

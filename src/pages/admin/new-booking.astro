@@ -1,8 +1,11 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import AuthGuard from '../../components/vue/AuthGuard.vue';
 import NewBooking from '../../components/vue/NewBooking.vue';
 ---
 
 <Layout title="Nueva Reserva - Hotel Sol">
-	<NewBooking client:load />
+  <AuthGuard client:load>
+    <NewBooking client:load />
+  </AuthGuard>
 </Layout>

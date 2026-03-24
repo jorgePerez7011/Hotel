@@ -1,0 +1,26 @@
+---
+import Layout from './Layout.astro';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<Layout title={title}>
+  <slot />
+</Layout>
+
+<script>
+  // Verificar autenticación en cliente
+  // Si el usuario no está autenticado, redirigir a login
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('hotelToken');
+    const user = localStorage.getItem('hotelUser');
+    
+    if (!token || !user) {
+      window.location.href = '/login';
+    }
+  }
+</script>

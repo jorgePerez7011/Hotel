@@ -1,10 +1,13 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import AuthGuard from '../../components/vue/AuthGuard.vue';
 import EmployeeManagement from '../../components/vue/EmployeeManagement.vue';
 ---
 
 <Layout title="Gestión de Empleados - Hotel Sol">
-  <main>
-    <EmployeeManagement client:load />
-  </main>
+  <AuthGuard client:load>
+    <main>
+      <EmployeeManagement client:load />
+    </main>
+  </AuthGuard>
 </Layout>

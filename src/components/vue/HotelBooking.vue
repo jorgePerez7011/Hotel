@@ -43,7 +43,7 @@
             <li><a href="/about" class="text-gray-700 hover:text-primary-600 transition-colors">Nosotros</a></li>
             <li><a href="/rooms" class="text-gray-700 hover:text-primary-600 transition-colors">Habitaciones</a></li>
             <li><a href="/services" class="text-gray-700 hover:text-primary-600 transition-colors">Servicios</a></li>
-            <li><a href="/admin/dashboard" class="text-gray-700 hover:text-primary-600 transition-colors">Panel Admin</a></li>
+            <li><a href="/login" class="text-gray-700 hover:text-primary-600 transition-colors">Panel Admin</a></li>
           </ul>
         </div>
       </nav>

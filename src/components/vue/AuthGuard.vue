@@ -1,8 +1,17 @@
-import { defineComponent, onMounted } from 'vue';
+<template>
+  <template v-if="isAuthenticated">
+    <slot></slot>
+  </template>
+</template>
+
+<script>
+import { defineComponent, ref, onMounted } from 'vue';
 
 export default defineComponent({
   name: 'AuthGuard',
   setup(_, { slots }) {
+    const isAuthenticated = ref(false);
+
     onMounted(() => {
       // Verificar autenticación en el cliente
       const token = localStorage.getItem('hotelToken');
@@ -13,6 +22,8 @@ export default defineComponent({
         window.location.href = '/login';
         return;
       }
+
+      isAuthenticated.value = true;
       
       // Opcional: Verificar validez del token con el servidor
       fetch('/api/auth/verify', {
@@ -35,6 +46,7 @@ export default defineComponent({
       });
     });
 
-    return () => slots.default?.();
+    return { isAuthenticated };
   }
 });
+</script>

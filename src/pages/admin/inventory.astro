@@ -1,8 +1,11 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import AuthGuard from '../../components/vue/AuthGuard.vue';
 import InventoryManagement from '../../components/vue/InventoryManagement.vue';
 ---
 
 <Layout title="Sistema de Inventarios - Hotel Sol">
-	<InventoryManagement client:load />
+  <AuthGuard client:load>
+    <InventoryManagement client:load />
+  </AuthGuard>
 </Layout>
