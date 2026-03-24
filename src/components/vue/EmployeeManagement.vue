@@ -489,7 +489,7 @@ const saveEmployee = async () => {
     
     if (editingEmployee.value) {
       // Update existing employee
-      response = await fetch(`http://localhost:4000/api/employees/${editingEmployee.value.id}`, {
+      response = await fetch(`/api/employees/${editingEmployee.value.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -572,7 +572,7 @@ const deleteEmployee = async (employee: Employee) => {
   }
 
   try {
-    const response = await fetch(`http://localhost:4000/api/employees/${employee.id}`, {
+    const response = await fetch(`/api/employees/${employee.id}`, {
       method: 'DELETE'
     });
 

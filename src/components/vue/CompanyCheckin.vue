@@ -1004,7 +1004,7 @@ const saveEditedCompany = async () => {
   savingCompany.value = true;
   try {
     // Enviar actualización a la API
-    const response = await fetch(`http://localhost:4000/api/companies/${companyToEdit.value.id}`, {
+    const response = await fetch(`/api/companies/${companyToEdit.value.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -1062,7 +1062,7 @@ const confirmDeleteCompany = async () => {
   savingCompany.value = true;
   try {
     // Enviar solicitud de eliminación a la API
-    const response = await fetch(`http://localhost:4000/api/companies/${companyToDelete.value.id}`, {
+    const response = await fetch(`/api/companies/${companyToDelete.value.id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'

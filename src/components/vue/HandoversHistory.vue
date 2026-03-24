@@ -302,7 +302,7 @@ export default {
 
     const deleteHandover = async (handoverId) => {
       try {
-        const response = await fetch(`http://localhost:4000/api/handovers/${handoverId}`, {
+        const response = await fetch(`/api/handovers/${handoverId}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json'

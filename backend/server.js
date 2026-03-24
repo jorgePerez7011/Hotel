@@ -55,13 +55,19 @@ app.use(cors({
   credentials: true
 }));
 
-// Rate limiting
+// Rate limiting - more generous for production
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
+  max: process.env.NODE_ENV === 'production' ? 500 : 100, // 500 req/15min in production, 100 in dev
+  message: 'Too many requests from this IP, please try again later.',
+  skip: (req) => {
+    // Skip rate limiting for static files
+    return req.path.startsWith('/Fotos') || req.path.startsWith('/_astro') || req.path.endsWith('.js') || req.path.endsWith('.css');
+  }
 });
-app.use(limiter);
+
+// Apply rate limiting only to API routes
+app.use('/api', limiter);
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
