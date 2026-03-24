@@ -151,7 +151,7 @@
                 <input 
                   v-model="bookingForm.phone"
                   type="tel" 
-                  placeholder=\"317 6388290 - 323 3928158\"
+                  placeholder="317 6388290 - 323 3928158"
                   class="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   required
                 />
