@@ -248,7 +248,7 @@
           <div class="relative">
       <div class="bg-gray-400 aspect-video rounded-lg overflow-hidden">
     <img
-      src="Fotos\FrenteHotel.jpg"
+      src="/Fotos/FrenteHotel.jpg"
       alt="Video background"
       class="w-full h-96 object-cover"
     >
@@ -320,7 +320,7 @@
           
           <div class=" h-[600px] overflow-hidden rounded-xl">
       <img 
-    src="Fotos\SalaComun.jpg" 
+    src="/Fotos/SalaComun.jpg" 
     alt="Descripcion de la imagen"
     class="w-full h-full object-cover"
           >
