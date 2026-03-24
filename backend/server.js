@@ -70,9 +70,17 @@ app.use(express.urlencoded({ extended: true }));
 // Logging middleware
 app.use(morgan('combined'));
 
+// Servir archivos estáticos públicos
+const publicPath = path.join(__dirname, '..', 'public');
+app.use(express.static(publicPath));
+
 // Servir archivos estáticos de Astro
 const distPath = path.join(__dirname, '..', 'dist');
 app.use(express.static(distPath));
+
+// Servir carpeta de fotos
+const fotosPath = path.join(__dirname, '..', 'Fotos');
+app.use('/Fotos', express.static(fotosPath));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
