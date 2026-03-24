@@ -1389,7 +1389,12 @@ onUnmounted(() => {
 // Load occupancy data
 const loadOccupancyData = async () => {
   try {
-    const response = await fetch('/api/hotel/rooms');
+    const token = localStorage.getItem('hotelToken');
+    const response = await fetch('/api/hotel/rooms', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
     const data = await response.json();
     
     if (data.success && data.summary) {
@@ -1459,7 +1464,12 @@ const handleStatClick = (statTitle) => {
 
 const loadMonthlyIncome = async () => {
   try {
-    const response = await fetch('/api/handovers/monthly-income');
+    const token = localStorage.getItem('hotelToken');
+    const response = await fetch('/api/handovers/monthly-income', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
     const data = await response.json();
     
     if (data.success && data.data) {
@@ -1489,8 +1499,17 @@ const loadMonthlyIncomeDetails = async () => {
   console.log('📥 Iniciando carga de detalles de ingresos...');
   try {
     // Cargar todos los datos sin filtro de fecha para permitir filtrado posterior
-    const checkoutResponse = await fetch('/api/bookings');
-    const handoverResponse = await fetch('/api/handovers');
+    const token = localStorage.getItem('hotelToken');
+    const checkoutResponse = await fetch('/api/bookings', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    const handoverResponse = await fetch('/api/handovers', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
     
     const checkoutData = await checkoutResponse.json();
     const handoverData = await handoverResponse.json();
@@ -1758,8 +1777,13 @@ watch([() => incomeSelectedDate.value, () => incomeSelectedWeek.value, () => inc
 // Load today's bookings
 const loadTodaysBookings = async () => {
   try {
+    const token = localStorage.getItem('hotelToken');
     const today = new Date().toISOString().split('T')[0];
-    const response = await fetch(`/api/bookings/by-date/${today}`);
+    const response = await fetch(`/api/bookings/by-date/${today}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
     const data = await response.json();
     
     if (data.success && data.bookings) {
@@ -1777,7 +1801,12 @@ const loadTodaysBookings = async () => {
 // Load recent bookings (últimas 5 reservas sin importar la fecha)
 const loadRecentBookings = async () => {
   try {
-    const response = await fetch('/api/bookings');
+    const token = localStorage.getItem('hotelToken');
+    const response = await fetch('/api/bookings', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
     const data = await response.json();
     
     if (data.success && Array.isArray(data.bookings)) {
@@ -2022,7 +2051,12 @@ watch(
 const fetchReservedRooms = async () => {
   loading.value = true;
   try {
-    const response = await fetch('/api/hotel/rooms');
+    const token = localStorage.getItem('hotelToken');
+    const response = await fetch('/api/hotel/rooms', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
     const data = await response.json();
     
     if (data.success && Array.isArray(data.rooms)) {
@@ -2087,7 +2121,12 @@ watch(
 const fetchAvailableRooms = async () => {
   loading.value = true;
   try {
-    const response = await fetch('/api/hotel/rooms');
+    const token = localStorage.getItem('hotelToken');
+    const response = await fetch('/api/hotel/rooms', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
     const data = await response.json();
     
     if (data.success) {
@@ -2166,7 +2205,8 @@ const performWalkInCheckin = async () => {
     const response = await fetch(`/api/hotel/rooms/${roomId}/checkin`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('hotelToken')}`
       },
       body: JSON.stringify({
         checkin_time: new Date().toISOString(),
@@ -2588,7 +2628,8 @@ const confirmCheckIn = async () => {
     const response = await fetch(`/api/hotel/rooms/${roomId}/checkin`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('hotelToken')}`
       },
       body: JSON.stringify(requestBody)
     });
