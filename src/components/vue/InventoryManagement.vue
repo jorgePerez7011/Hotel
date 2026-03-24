@@ -359,7 +359,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 
 const inventoryItems = ref([]);
 const searchQuery = ref('');
@@ -370,6 +370,7 @@ const showDeleteConfirm = ref(false);
 const editingItem = ref(null);
 const itemToDelete = ref(null);
 const successMessage = ref('');
+const isLoading = ref(false);
 
 const formData = ref({
   code: '',
@@ -409,6 +410,35 @@ const totalValue = computed(() => {
   }, 0);
 });
 
+// Cargar productos desde la API
+const loadProducts = async () => {
+  try {
+    isLoading.value = true;
+    const response = await fetch('https://solhotel.co/api/inventory/products');
+    
+    if (!response.ok) {
+      throw new Error('Error al cargar productos');
+    }
+    
+    const data = await response.json();
+    inventoryItems.value = data.data || [];
+  } catch (error) {
+    console.error('Error loading products:', error);
+    successMessage.value = 'Error al cargar productos: ' + error.message;
+    showSuccessModal.value = true;
+    setTimeout(() => {
+      showSuccessModal.value = false;
+    }, 3000);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Cargar productos al montar el componente
+onMounted(() => {
+  loadProducts();
+});
+
 const openFormModal = (item) => {
   if (item) {
     editingItem.value = item;
@@ -433,27 +463,59 @@ const closeFormModal = () => {
   editingItem.value = null;
 };
 
-const saveItem = () => {
-  if (editingItem.value) {
-    const index = inventoryItems.value.findIndex(item => item.id === editingItem.value.id);
-    if (index !== -1) {
-      inventoryItems.value[index] = { ...formData.value };
-      successMessage.value = `Producto "${formData.value.name}" actualizado correctamente`;
+const saveItem = async () => {
+  try {
+    isLoading.value = true;
+    
+    const url = editingItem.value 
+      ? `https://solhotel.co/api/inventory/products/${editingItem.value.id}`
+      : 'https://solhotel.co/api/inventory/products';
+    
+    const method = editingItem.value ? 'PUT' : 'POST';
+    
+    const response = await fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData.value)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error al guardar producto');
     }
-  } else {
-    const newItem = {
-      id: Math.max(...inventoryItems.value.map(item => item.id), 0) + 1,
-      ...formData.value
-    };
-    inventoryItems.value.push(newItem);
-    successMessage.value = `Producto "${formData.value.name}" creado correctamente`;
+    
+    const data = await response.json();
+    
+    if (editingItem.value) {
+      // Actualizar en la lista
+      const index = inventoryItems.value.findIndex(item => item.id === editingItem.value.id);
+      if (index !== -1) {
+        inventoryItems.value[index] = data.data;
+      }
+      successMessage.value = `Producto "${formData.value.name}" actualizado correctamente`;
+    } else {
+      // Agregar a la lista
+      inventoryItems.value.push(data.data);
+      successMessage.value = `Producto "${formData.value.name}" creado correctamente`;
+    }
+    
+    closeFormModal();
+    showSuccessModal.value = true;
+    setTimeout(() => {
+      showSuccessModal.value = false;
+    }, 3000);
+  } catch (error) {
+    console.error('Error saving product:', error);
+    successMessage.value = 'Error: ' + error.message;
+    showSuccessModal.value = true;
+    setTimeout(() => {
+      showSuccessModal.value = false;
+    }, 3000);
+  } finally {
+    isLoading.value = false;
   }
-  
-  closeFormModal();
-  showSuccessModal.value = true;
-  setTimeout(() => {
-    showSuccessModal.value = false;
-  }, 3000);
 };
 
 const deleteItem = (id) => {
@@ -461,18 +523,40 @@ const deleteItem = (id) => {
   showDeleteConfirm.value = true;
 };
 
-const confirmDelete = () => {
-  const index = inventoryItems.value.findIndex(item => item.id === itemToDelete.value.id);
-  if (index !== -1) {
-    const itemName = inventoryItems.value[index].name;
-    inventoryItems.value.splice(index, 1);
+const confirmDelete = async () => {
+  try {
+    isLoading.value = true;
+    
+    const response = await fetch(
+      `https://solhotel.co/api/inventory/products/${itemToDelete.value.id}`,
+      {
+        method: 'DELETE'
+      }
+    );
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error al eliminar producto');
+    }
+    
+    const itemName = itemToDelete.value.name;
+    inventoryItems.value = inventoryItems.value.filter(item => item.id !== itemToDelete.value.id);
     successMessage.value = `Producto "${itemName}" eliminado correctamente`;
     showSuccessModal.value = true;
     setTimeout(() => {
       showSuccessModal.value = false;
     }, 3000);
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    successMessage.value = 'Error: ' + error.message;
+    showSuccessModal.value = true;
+    setTimeout(() => {
+      showSuccessModal.value = false;
+    }, 3000);
+  } finally {
+    isLoading.value = false;
+    showDeleteConfirm.value = false;
   }
-  showDeleteConfirm.value = false;
 };
 
 const goBack = () => {

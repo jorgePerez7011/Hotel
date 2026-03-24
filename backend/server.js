@@ -20,6 +20,7 @@ import handoverRoutes from './routes/handovers.js';
 import reportsRoutes from './routes/reports.js';
 import companiesRoutes from './routes/companies.js';
 import invoicesRoutes from './routes/invoices.js';
+import inventoryRoutes from './routes/inventory.js';
 
 // Import database connections
 import { connectMySQL } from './config/mysql.js';
@@ -140,6 +141,7 @@ app.use('/api/handovers', handoverRoutes);
 app.use('/api/reports', reportsRoutes);
 app.use('/api/companies', companiesRoutes);
 app.use('/api/invoices', invoicesRoutes);
+app.use('/api/inventory', inventoryRoutes);
 
 // SPA fallback - sirve index.html para rutas no encontradas
 app.get('*', (req, res) => {
